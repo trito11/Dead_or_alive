@@ -15,8 +15,4 @@ Tạo class Agent: đưa ra quyết định chọn hành động nào
     train(số iter, số episode, số duration, tham số tối ưu,số episode):Huấn luyện thuật toán
     test(): 
     runAC():
-    
-
-
-
 '''
