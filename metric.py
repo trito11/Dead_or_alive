@@ -24,3 +24,11 @@ def haversine(lon1, lat1, lon2, lat2):
     km = 6371* c
     return km
 
+'''
+Toc do truyen ko day
+'''
+def getRateTransData(channel_banwidth, pr, distance, path_loss_exponent, sigmasquare):
+    return (channel_banwidth * np.log2(
+            1 + pr / np.power(distance,path_loss_exponent) / sigmasquare
+        )
+    ) 

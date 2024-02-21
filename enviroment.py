@@ -29,5 +29,61 @@ task_distance(xe_thu_i,tac_vu_j,thoi_gian_k)=>Khoang cách của task j đến x
     Tính khoảng cách theo tọa độ, tọa độ xe xác định tại thời gian gần với k nhất 
   
 '''
+import numpy as np
+import pandas as pd
+import gym
+from gym import spaces
+from gym.utils import seeding
+import copy
+import os
+
+from config import *
+
+class BusEnv(gym.Env):
+    def __init__(self, env=None):
+        self.env = env
+        # episode đầu
+        self.index_of_episode = 0
+        # Tổng phần thưởng
+        self.sum_reward = 0
+        # Số phần thưởng đã nhận
+        self.nreward = 0
+        # Không gian hành động
+        self.n_actions=NUM_ACTION
+        # Không gian state
+        self.n_observations=NUM_STATE
+
+        
+        pass
+
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
+    def replay(self):
+        # Khởi đâù của iter đặt lại episode về 0
+        self.index_of_episode = 0
+        pass
+    def step(self, action):
+        
+        pass
+        return self.observation, reward, done
+        
+    def reset(self):
+        self.observation=np.zero(NUM_STATE)
+        pass
+    # Đến state đầu của episode tiếp theo
+        self.index_of_episode +=1
+        return self.observation
+    
+    def task_distance(self, bus_number,long_task,lat_task,time):
+        pass
+        return distance
+
+    
+
+    
+
+
+    
 
 
