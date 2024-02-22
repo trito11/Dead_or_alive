@@ -12,3 +12,10 @@ create_location_task_after(long,lat,time)=>new long, lat
     Tạo vị trí mới của người dùng sau x time từ vị trí ban đầu, xác định vị trí để gửi trả kết quả sau x time xử lý 
     Tọa độ dịch chuyển theo 1 vector: hướng bất kỳ, độ dài=vận tốc*time, vận tốc ngẫu nhiên(0-40km/h) 
 '''
+
+from config import *
+
+def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EACH_EPISODE, num = NUM_EPISODE):
+    pass
+
+

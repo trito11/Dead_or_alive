@@ -51,20 +51,19 @@ class BusEnv(gym.Env):
         # Không gian hành động
         self.n_actions=NUM_ACTION
         # Không gian state
-        self.n_observations=NUM_STATE
-
-        
+        self.n_observations=NUM_STATE  
         pass
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
+    
     def replay(self):
         # Khởi đâù của iter đặt lại episode về 0
         self.index_of_episode = 0
         pass
+
     def step(self, action):
-        
         pass
         return self.observation, reward, done
         

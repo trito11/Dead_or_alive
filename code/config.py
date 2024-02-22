@@ -22,10 +22,12 @@ CHANNEL_BANDWIDTH = 20
 PATH_LOSS_EXPONENT = 4 
 
 # Tham số về mô hình
-NUM_VEHICLE=
-NUM_ACTION = 
-NUM_STATE=
-NUM_TASKS_PER_TIME_SLOT = 
+NUM_VEHICLE = 10
+NUM_ACTION = NUM_VEHICLE + 1 # thêm 1 trường hợp bị là loại bỏ
+NUM_STATE = NUM_VEHICLE # [[cac khoang cach toi xe 1, do dai hang cho xe 1], [tuong tu voi xe 2], ...]
+NUM_TASKS_PER_TIME_SLOT = 100 # moi time slot la 30s
+TIME_EACH_EPISODE = 30 # giay
+NUM_EPISODE = 100
 
 # Đường dẫn lưu trữ file
 LINK_PROJECT = Path(os.path.abspath(__file__))
@@ -36,8 +38,8 @@ RESULT_DIR = os.path.join(LINK_PROJECT, "result/")
 DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
 
 # Tốc độ xử lý và yêu cầu tài nguyên của các loại task
-COMPUTATIONAL_CAPACITY=
-Required_Computing_Resources=
+COMPUTATIONAL_CAPACITY = 1
+Required_Computing_Resources = 1
 
 
 
