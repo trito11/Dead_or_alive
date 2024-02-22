@@ -10,6 +10,8 @@ create_point(hex_boundary)=>Tạo 1 điểm trong hình vuông bao quanh hình l
 ''' 
 import random
 import folium
+import h3
+
 class Point:
     def __init__(self, lng, lat):
         self.x = lng
