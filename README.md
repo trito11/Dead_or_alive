@@ -9,6 +9,7 @@ Sắp xếp theo độ ưu tiên
     1. Dữ liệu xe bus trên Kaggle [Bus data Rio](kaggle.com/igorbalteiro/gps-data-from-rio-de-janeiro-buses) (Not done)
     2. Dùng Carla simulation [Carla](https://carla.readthedocs.io/en/latest/) (Not done)
 
+
     
 +++ Xây dựng mô hình hexagon H3 xung quanh tọa độ xe (Not done)
     [Ý tưởng sử dụng](https://stackoverflow.com/questions/70251511/using-h3-to-get-the-closest-vehicles-to-a-geolocation)
@@ -31,7 +32,7 @@ Sắp xếp theo độ ưu tiên
 
 
 ## Table of contents
-1. [Task lists](#Task lists)
+1. [Task_lists](#Task lists)
 2. [Contribute](#Contribute)
 3. [Requirement](#Dependencies)
 4. [Installation](#INSTALLATION)
@@ -57,5 +58,7 @@ pip install torch
 
 ## Data 
 [Bus data Rio](kaggle.com/igorbalteiro/gps-data-from-rio-de-janeiro-buses)
+
 [Computing Resource](https://www.mdpi.com/2079-9292/12/15/3223)
+
 []
