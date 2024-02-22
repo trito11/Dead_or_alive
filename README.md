@@ -8,6 +8,8 @@ Sắp xếp theo độ ưu tiên
 +++ Lấy dữ liệu xe bus (Not done)
     1. Dữ liệu xe bus trên Kaggle [Bus data Rio](kaggle.com/igorbalteiro/gps-data-from-rio-de-janeiro-buses) (Not done)
     2. Dùng Carla simulation [Carla](https://carla.readthedocs.io/en/latest/) (Not done)
+
+    
 +++ Xây dựng mô hình hexagon H3 xung quanh tọa độ xe (Not done)
     [Ý tưởng sử dụng](https://stackoverflow.com/questions/70251511/using-h3-to-get-the-closest-vehicles-to-a-geolocation)
 
