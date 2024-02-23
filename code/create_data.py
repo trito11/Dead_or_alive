@@ -1,8 +1,14 @@
 '''
 Chứa các hàm sinh data:người dùng, tác vụ
 
-create_task(số task, thời gian 1 episode, số episode)=>Tạo một thư mục(n task) chứa các file là các tác vụ ứng với từng episode 
-        Các tác vụ bao gồm: time khởi tạo; tài nguyên tính toán; dung lượng bộ nhớ tiêu thụ; kích thức dữ liệu đầu vào, ra;deadline; kinh độ,vĩ độ của tác vụ
+create_task(số task, thời gian 1 episode, số episode)=>Tạo một thư mục (n task) chứa các file là các tác vụ ứng với từng episode 
+        Các tác vụ bao gồm: \(t_i,lat_i,long_i,r_i,m_i, s_(i,out), s_(i,in), d_i)
+            t_i là thời điểm khi tác vụ được tạo ra
+            lat_i,long_i  là kinh độ và vĩ độ của vị trí tác vụ
+            r_i là lượng tài nguyên máy tính cần thiết để sử lý tác vụ
+            m_i là dung lượng bộ nhớ tiêu thụ
+            s_(i,in) và s_(i,out) là kích thước dữ liệu đầu vào và đầu ra
+            d_i là thời gian tác vụ cần được sử lý
             !!!Chú ý mỗi episode dài 30s(thay đổi sau dc), episode sau là bắt đầu từ kết thúc episode trc: episode 1:0->30, eps2:30-60,eps3:60-90
 
 

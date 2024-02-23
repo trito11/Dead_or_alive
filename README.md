@@ -15,6 +15,8 @@ Sắp xếp theo độ ưu tiên
 
     https://carla.readthedocs.io/en/latest/ (Not done)
 
+
+    
 +++ Xây dựng mô hình hexagon H3 xung quanh tọa độ xe (Not done)
     
     https://stackoverflow.com/questions/70251511/using-h3-to-get-the-closest-vehicles-to-a-geolocation
@@ -72,4 +74,4 @@ pip install torch
 
 [Computing Resource](https://www.mdpi.com/2079-9292/12/15/3223)
 
-[]
+[Taxi_coordinate_data](https://www.kaggle.com/datasets/henrikengdahl/taximovementconcatenated)
