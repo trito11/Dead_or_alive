@@ -32,14 +32,20 @@ NUM_EPISODE = 100
 # Đường dẫn lưu trữ file
 LINK_PROJECT = Path(os.path.abspath(__file__))
 LINK_PROJECT = LINK_PROJECT.parent.parent
-DATA_LOCATION = "data_task/data" + str(NUM_TASKS_PER_TIME_SLOT) + "/"
+DATA_LOCATION = "data_task/data" + str(NUM_TASKS_PER_TIME_SLOT) + "_per_" + str(TIME_EACH_EPISODE) + "/"
 DATA_DIR = os.path.join(LINK_PROJECT, "data")
 RESULT_DIR = os.path.join(LINK_PROJECT, "result/")
 DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
 
 # Tốc độ xử lý và yêu cầu tài nguyên của các loại task
 COMPUTATIONAL_CAPACITY = 1
-Required_Computing_Resources = 1
+Required_Computing_Resources = [1] # đơn vị là GFLOPS
+
+#
+MIN_S_IN = 400 # MB
+MAX_S_IN = 500
+MIN_S_OUT = 1.5 # KB
+MAX_S_OUT = 2
 
 
 

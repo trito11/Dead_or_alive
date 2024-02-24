@@ -16,6 +16,7 @@ class Point:
     def __init__(self, lng, lat):
         self.x = lng
         self.y = lat
+        
 def create_point(hex_boundary):
     vertices = [(lon, lat) for lon,lat in hex_boundary]
     # Tìm tọa độ x và y tối đa, tối thiểu của hình lục giác
