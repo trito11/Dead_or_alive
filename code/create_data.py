@@ -33,7 +33,7 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
 
 
             # lượng tài nguyên cần thiết - cấu hình trong trong file config
-            r = random.choice(Required_Computing_Resources)
+            r = random.uniform(REQUIRED_GPU_FLOPS[0], REQUIRED_GPU_FLOPS[1])
 
             # 
             m = # bộ nhớ tiêu thụ - cấu hình trong file config
@@ -43,7 +43,7 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             s_out = random.uniform(MIN_S_OUT, MAX_S_OUT)
 
             # deadline
-            d = 
+            d = random.uniform(DEADLINE[0], DEADLINE[1])
 
             # Thêm một hàng vào DataFrame
             df.loc[len(df)] = [time, lat, long, r, m, s_in, s_out, d]

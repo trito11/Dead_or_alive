@@ -38,14 +38,19 @@ RESULT_DIR = os.path.join(LINK_PROJECT, "result/")
 DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
 
 # Tốc độ xử lý và yêu cầu tài nguyên của các loại task
-COMPUTATIONAL_CAPACITY = 1
-Required_Computing_Resources = [1] # đơn vị là GFLOPS
+# https://doi.org/10.1109/TMC.2020.2994232
+# https://doi.org/10.1109/ACCESS.2023.3252575
+
+REQUIRED_CPU_CYCLE = 400  
+REQUIRED_GPU_FLOPS = [1000, 1500] # đơn vị là GFLOPS
 
 #
-MIN_S_IN = 400 # MB
+MIN_S_IN = 400 # KB
 MAX_S_IN = 500
 MIN_S_OUT = 1.5 # KB
 MAX_S_OUT = 2
 
+#
+DEADLINE = [1.5, 2]
 
 
