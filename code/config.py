@@ -13,7 +13,7 @@ channel_banwidth, pr, distance, path_loss_exponent, sigmasquare
 '''
 import os
 from pathlib import Path
-
+from hexagon import *
 # Tham số truyền thông
 Pr = 46
 P = 39.810  # mW
@@ -25,14 +25,16 @@ PATH_LOSS_EXPONENT = 4
 NUM_VEHICLE = 10
 NUM_ACTION = NUM_VEHICLE + 1 # thêm 1 trường hợp bị là loại bỏ
 NUM_STATE = NUM_VEHICLE # [[cac khoang cach toi xe 1, do dai hang cho xe 1], [tuong tu voi xe 2], ...]
-NUM_TASKS_PER_TIME_SLOT = 100 # moi time slot la 30s
+NUM_TASKS_PER_TIME_SLOT = 800 # moi time slot la 30s
 TIME_EACH_EPISODE = 30 # giay
 NUM_EPISODE = 100
+MIN_NUM_TIME=50
+MAX_NUM_TIME=200
 
 # Đường dẫn lưu trữ file
 LINK_PROJECT = Path(os.path.abspath(__file__))
 LINK_PROJECT = LINK_PROJECT.parent.parent
-DATA_LOCATION = "data_task/data" + str(NUM_TASKS_PER_TIME_SLOT) + "_per_" + str(TIME_EACH_EPISODE) + "/"
+DATA_LOCATION = "data_task/data" + str(NUM_TASKS_PER_TIME_SLOT) + "_per_" + str(TIME_EACH_EPISODE)
 DATA_DIR = os.path.join(LINK_PROJECT, "data")
 RESULT_DIR = os.path.join(LINK_PROJECT, "result/")
 DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
@@ -41,8 +43,12 @@ DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
 # https://doi.org/10.1109/TMC.2020.2994232
 # https://doi.org/10.1109/ACCESS.2023.3252575
 
+
 REQUIRED_CPU_CYCLE = 400  
-REQUIRED_GPU_FLOPS = [1000, 1500] # đơn vị là GFLOPS
+REQUIRED_GPU_FLOPS = [1000, 1500] # đơn vị là GFLOPs
+BUS_OBJECT_DTECTION= 6586 #Lâu lâu xe bus nhận diện biển báo trên đường
+PEOPLE_DETECTION_TASK=   # Nhận diện số người lên xuống xe khi đến điểm đón trả speed <=10
+PROCESSING_POWER=12134 # đơn vị là GFLOPS của GTX 4050
 
 #
 MIN_S_IN = 400 # KB
@@ -54,3 +60,13 @@ MAX_S_OUT = 2
 DEADLINE = [1.5, 2]
 
 
+#Thông số về tọa độ mô hình h3
+HEX_CENTER_COORDINATES=(-22.899897051983327, -43.278764907166455)
+HEX_LEVEL=7
+NUM_NEIGHBORHOOD=3
+#Lấy mã của ô H3 trung tâm ứng với mức hex_level
+CENTER_H3 = h3.geo_to_h3(HEX_CENTER_COORDINATES[0], HEX_CENTER_COORDINATES[1], HEX_LEVEL)
+#Lấy mã các ô xung quanh
+NEIGHBOR_HEX=get_surrounding_h3(CENTER_H3, NUM_NEIGHBORHOOD)
+#Tham số cho các phân phối
+LAMDA = 5 #Poisson
