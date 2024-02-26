@@ -85,10 +85,12 @@ def visualize_polygon(polyline, color):
     m.add_child(my_PolyLine)
     return m
 
+#Vẽ biểu đồ các điểm với 2 trục là lat và lng của bộ dự liệu xe bus
 def plot_scatter(df, metric_col, x='longitude', y='latitude', marker='.', alpha=1, figsize=(16,12), colormap='viridis'):
     df.plot.scatter(x=x, y=y, c=metric_col, title=metric_col
                     , edgecolors='none', colormap=colormap, marker=marker, alpha=alpha, figsize=figsize);
     plt.xticks([], []); plt.yticks([], [])
+
 def aperture_downsampling(df, hex_col, metric_col, coarse_aperture_size):
     df_coarse = df.copy()
     coarse_hex_col = 'hex{}'.format(coarse_aperture_size)
@@ -98,6 +100,7 @@ def aperture_downsampling(df, hex_col, metric_col, coarse_aperture_size):
     dfc['lng'] = dfc[coarse_hex_col].apply(lambda x: h3.h3_to_geo(x)[1])
     return dfc
 
+#Chuyểnn các tọa độ thành hình hexagon
 def kring_smoothing(df, hex_col, metric_col, k):
     dfk = df[[hex_col]]
     dfk.index = dfk[hex_col]
@@ -112,6 +115,7 @@ def kring_smoothing(df, hex_col, metric_col, k):
     dfs['longitude'] = dfs[hex_col].apply(lambda x: h3.h3_to_geo(x)[1])
     return dfs
 
+#Tính biểu độ nhiệt với các hình lục giác xem mật độ các điểm nhuư thế nào
 def weighted_kring_smoothing(df, hex_col, metric_col, coef):
     # normalize the coef
     a = []
@@ -141,6 +145,7 @@ def weighted_kring_smoothing(df, hex_col, metric_col, coef):
     dfs['lat'] = dfs[hex_col].apply(lambda x: h3.h3_to_geo(x)[0])
     dfs['lng'] = dfs[hex_col].apply(lambda x: h3.h3_to_geo(x)[1])
     return dfs
+#Vẽ minh họa k-ring xung quanh tọa độ gốc
 def visualize_k_ring(center_lat, center_lng, k,level):
     # Tạo một bản đồ Folium
     m = folium.Map(location=[center_lat, center_lng], zoom_start=10)
@@ -171,7 +176,7 @@ def visualize_k_ring(center_lat, center_lng, k,level):
 
     # Hiển thị bản đồ
     return m
-
+#Lấy chỉ số các ô H3 xung quanh
 def get_surrounding_h3(h3_index, k):
     # Sử dụng hàm k_ring để lấy các ô h3 xung quanh
     surrounding_h3 = h3.k_ring(h3_index, k)
