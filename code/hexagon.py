@@ -11,14 +11,14 @@ create_point(hex_boundary)=>Tạo 1 điểm trong hình vuông bao quanh hình l
 import random
 import folium
 import h3
-import panda as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from config import *
 
 class Point:
     def __init__(self, lat, lng):
-        self.x = lat
-        self.y = lng
+        self.lat = lat
+        self.lng = lng
         
 def create_point(hex_boundary):
     vertices = [(lat, lng) for lat,lng in hex_boundary]

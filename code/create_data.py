@@ -25,15 +25,15 @@ import h3
 import numpy as np
 import os
 from pathlib import Path
+from hexagon import create_point
 
 path = os.path.abspath(__file__)
 path = Path(path).parent.parent
 
-def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EACH_EPISODE, num = NUM_EPISODE, hexagon = None):
-    try:
-        os.makedirs(DATA_LOCATION) 
-    except OSError as e:
-        print(e)
+def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EACH_EPISODE, num = NUM_EPISODE):
+    data_location = "{}/{}".format(str(path), DATA_LOCATION)
+    if not os.path.exists(data_location):
+        os.makedirs(data_location)
 
     for i in range(NUM_EPISODE):
         with open("{}/{}/datatask{}.csv".format(str(path), DATA_LOCATION, i), "w") as output:
@@ -43,14 +43,14 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             #30s mình sinh ra ngẫu nhiên x khe thời gian đang sinh theo phân phối uniform
             num_time=int(random.uniform(MIN_NUM_TIME,MAX_NUM_TIME))
             #Sinh thời gian ứng với x khe thời gian
-            t = np.sort(np.random.randint(i*100*time_each_episode,(i+1)*100*time_each_episode,num_time)/100) #Thời gian các task xuất hiện
+            t = np.sort(np.random.randint(i*100*time_each_episode,(i+1)*100*time_each_episode,NUM_TASKS_PER_TIME_SLOT)/100) #Thời gian các task xuất hiện
             #Sinh số lượng task theo phân phối poisson trong từng khe thời gian
-            tasks_per_interval = np.random.poisson(num_tasks / num_time, num_time)
-
+            tasks_per_interval = np.random.poisson(NUM_TASKS_PER_TIME_SLOT / num_time, num_time)
+            print(f"old {np.sum(tasks_per_interval)}")
             total_generated_tasks = np.sum(tasks_per_interval)
 
             # Tính số lượng tác vụ thừa
-            excess_tasks = total_generated_tasks - num_tasks
+            excess_tasks = total_generated_tasks - NUM_TASKS_PER_TIME_SLOT
 
             # Phân bổ số lượng tác vụ thừa vào các khoảng thời gian trước đó
             if excess_tasks > 0:
@@ -59,12 +59,19 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
                         break
                     tasks_per_interval[i] -= 1
                     excess_tasks -= 1
+            if excess_tasks < 0:
+                for i in range(num_time):
+                    if excess_tasks == 0:
+                        break
+                    tasks_per_interval[i] += 1
+                    excess_tasks += 1
+            print(np.sum(tasks_per_interval))
             #Poisson process point
             # tạo tọa độ
             #Lặp cho từng khe thời gian thì lấy ngẫu nhiên 1 ô H3
             for time in range(num_time):
                 num_task=tasks_per_interval[time]
-                random_index=random.choice(NEIGHBOR_HEX)
+                random_index=random.choice(list(NEIGHBOR_HEX))
                 hex_boundary = h3.h3_to_geo_boundary(random_index) # array of arrays of [lat, lng]
                 #Sinh tọa độ ngẫu nhiên trong ô h3 với từng task 
                 for j in range(num_task):
@@ -73,26 +80,22 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
                     lng.append(point.lng)
             
             # lượng tài nguyên cần thiết - cấu hình trong trong file config
-            r = random.uniform(REQUIRED_GPU_FLOPS[0], REQUIRED_GPU_FLOPS[1],NUM_TASKS_PER_TIME_SLOT)
-
+            r = np.random.randint(REQUIRED_GPU_FLOPS[0], REQUIRED_GPU_FLOPS[1],NUM_TASKS_PER_TIME_SLOT)
             # 
-            m =random.uniform() # bộ nhớ tiêu thụ - cấu hình trong file config
+            m =REQUIRED_GPU_RAM # bộ nhớ tiêu thụ - cấu hình trong file config
 
             #
-            s_in = random.uniform(MIN_S_IN, MAX_S_IN,NUM_TASKS_PER_TIME_SLOT)
-            s_out = random.uniform(MIN_S_OUT, MAX_S_OUT)
+            s_in = np.random.randint(MIN_S_IN, MAX_S_IN,NUM_TASKS_PER_TIME_SLOT)
+            s_out = np.random.randint(MIN_S_OUT*10, MAX_S_OUT*10,NUM_TASKS_PER_TIME_SLOT)/10
 
             # deadline
-            d = random.uniform(DEADLINE[0], DEADLINE[1],NUM_TASKS_PER_TIME_SLOT)
-
-            # Thêm một hàng vào DataFrame
-            df.loc[len(df)] = [time, lat, long, r, m, s_in, s_out, d]
-
-
-            # lưu dữ liệu theo file 
-            csv_file_path = DATA_LOCATION + "file" + i
-            df.to_csv(csv_file_path, index=False)
-
+            d = np.random.randint(DEADLINE[0]*100, DEADLINE[1]*100,NUM_TASKS_PER_TIME_SLOT)/100
+            print(len(lat))
+            for j in range(num_tasks):
+                output.write("{},{},{},{},{},{},{},{}\n".format(
+                    t[j], lat[j], lng[j], r[j], m, s_in[j],s_out[j],d[j]))
+                
+        
 
 # Hàm dịch chuyển điểm theo một hướng ngẫu nhiên
 def move_random(latitude, longitude, distance_meters):
@@ -122,4 +125,6 @@ def create_location_task_after(lat,lng,time):
             return new_lat,new_lng
 
 if __name__ == '__main__':
-    
+    np.random.seed(SEED)
+    random.seed(SEED)
+    create_task()
