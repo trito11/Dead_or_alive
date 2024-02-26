@@ -9,7 +9,7 @@ Sắp xếp theo độ ưu tiên
 
     1. Dữ liệu xe bus trên Kaggle 
     
-    kaggle.com/igorbalteiro/gps-data-from-rio-de-janeiro-buses (Not done)
+    kaggle.com/igorbalteiro/gps-data-from-rio-de-janeiro-buses ( done)
 
     2. Dùng Carla simulation 
 
@@ -17,12 +17,12 @@ Sắp xếp theo độ ưu tiên
 
 
     
-+++ Xây dựng mô hình hexagon H3 xung quanh tọa độ xe (Not done)
++++ Xây dựng mô hình hexagon H3 xung quanh tọa độ xe (done)
     
     https://stackoverflow.com/questions/70251511/using-h3-to-get-the-closest-vehicles-to-a-geolocation
 
 
-+++ Từ mô hình H3 sinh dữ liệu của các task và tọa độ của người dùng (Not done)
++++ Từ mô hình H3 sinh dữ liệu của các task và tọa độ của người dùng (done)
 
     1.Dữ liệu các task sinh ngẫu nhiên theo 
     https://www.mdpi.com/2079-9292/12/15/3223 chọn ngẫu nhiên 1 trong 3
@@ -69,9 +69,9 @@ pip install torch
 
 
 
-## Data 
-[Bus data Rio](kaggle.com/igorbalteiro/gps-data-from-rio-de-janeiro-buses)
+## Data
+Bus data Rio: kaggle.com/igorbalteiro/gps-data-from-rio-de-janeiro-buses
 
-[Computing Resource](https://www.mdpi.com/2079-9292/12/15/3223)
+Computing Resource: https://www.mdpi.com/2079-9292/12/15/3223
 
-[Taxi_coordinate_data](https://www.kaggle.com/datasets/henrikengdahl/taximovementconcatenated)
+Taxi_coordinate_data: https://www.kaggle.com/datasets/henrikengdahl/taximovementconcatenated

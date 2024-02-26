@@ -54,7 +54,7 @@ class BusEnv(gym.Env):
         self.n_observations=NUM_STATE  
         pass
 
-    def seed(self, seed=None):
+    def seed(self, seed=SEED):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
     

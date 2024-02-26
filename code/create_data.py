@@ -46,7 +46,6 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             t = np.sort(np.random.randint(i*100*time_each_episode,(i+1)*100*time_each_episode,NUM_TASKS_PER_TIME_SLOT)/100) #Thời gian các task xuất hiện
             #Sinh số lượng task theo phân phối poisson trong từng khe thời gian
             tasks_per_interval = np.random.poisson(NUM_TASKS_PER_TIME_SLOT / num_time, num_time)
-            print(f"old {np.sum(tasks_per_interval)}")
             total_generated_tasks = np.sum(tasks_per_interval)
 
             # Tính số lượng tác vụ thừa
@@ -65,7 +64,6 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
                         break
                     tasks_per_interval[i] += 1
                     excess_tasks += 1
-            print(np.sum(tasks_per_interval))
             #Poisson process point
             # tạo tọa độ
             #Lặp cho từng khe thời gian thì lấy ngẫu nhiên 1 ô H3
@@ -90,7 +88,6 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
 
             # deadline
             d = np.random.randint(DEADLINE[0]*100, DEADLINE[1]*100,NUM_TASKS_PER_TIME_SLOT)/100
-            print(len(lat))
             for j in range(num_tasks):
                 output.write("{},{},{},{},{},{},{},{}\n".format(
                     t[j], lat[j], lng[j], r[j], m, s_in[j],s_out[j],d[j]))
