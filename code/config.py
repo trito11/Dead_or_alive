@@ -13,7 +13,8 @@ channel_banwidth, pr, distance, path_loss_exponent, sigmasquare
 '''
 import os
 from pathlib import Path
-from hexagon import *
+from hexagon import get_surrounding_h3
+import h3
 # Tham số truyền thông
 Pr = 46
 P = 39.810  # mW
@@ -47,11 +48,11 @@ DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
 REQUIRED_CPU_CYCLE = 400  
 REQUIRED_GPU_FLOPS = [1000, 1500] # đơn vị là GFLOPs
 IMAGE_RECOGNITION = 0.615 # đơn vị là GFLOPs
-
 BUS_OBJECT_DTECTION= 6586 #Lâu lâu xe bus nhận diện biển báo trên đường
-
 PROCESSING_POWER=12134 # đơn vị là GFLOPS của GTX 4050
 REQUIRED_GPU_RAM=1782.56 #Đơn vị là MB
+GPU_RAM_BUS=16 #GB RAM của GTX 4050
+MOBIE_GPU_FLOPS=171.26 # đơn vị là GFLOPS của Apple A15 Bionic
 #
 MIN_S_IN = 400 # KB
 MAX_S_IN = 500
