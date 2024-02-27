@@ -43,7 +43,8 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             #30s mình sinh ra ngẫu nhiên x khe thời gian đang sinh theo phân phối uniform
             num_time=int(random.uniform(MIN_NUM_TIME,MAX_NUM_TIME))
             #Sinh thời gian ứng với x khe thời gian
-            t = np.sort(np.random.randint(i*100*time_each_episode,(i+1)*100*time_each_episode,NUM_TASKS_PER_TIME_SLOT)/100) #Thời gian các task xuất hiện
+            t = np.sort(np.random.randint(i*100*time_each_episode,(i+1)*100*time_each_episode,num_time)/100) #Thời gian các task xuất hiện
+            time=[]
             #Sinh số lượng task theo phân phối poisson trong từng khe thời gian
             tasks_per_interval = np.random.poisson(NUM_TASKS_PER_TIME_SLOT / num_time, num_time)
             total_generated_tasks = np.sum(tasks_per_interval)
@@ -67,8 +68,8 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             #Poisson process point
             # tạo tọa độ
             #Lặp cho từng khe thời gian thì lấy ngẫu nhiên 1 ô H3
-            for time in range(num_time):
-                num_task=tasks_per_interval[time]
+            for i in range(num_time):
+                num_task=tasks_per_interval[i]
                 random_index=random.choice(list(NEIGHBOR_HEX))
                 hex_boundary = h3.h3_to_geo_boundary(random_index) # array of arrays of [lat, lng]
                 #Sinh tọa độ ngẫu nhiên trong ô h3 với từng task 
@@ -76,6 +77,7 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
                     point=create_point(hex_boundary)
                     lat.append(point.lat)
                     lng.append(point.lng)
+                    time.append(t[i])
             
             # lượng tài nguyên cần thiết - cấu hình trong trong file config
             r = np.random.randint(REQUIRED_GPU_FLOPS[0], REQUIRED_GPU_FLOPS[1],NUM_TASKS_PER_TIME_SLOT)
@@ -90,7 +92,7 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             d = np.random.randint(DEADLINE[0]*100, DEADLINE[1]*100,NUM_TASKS_PER_TIME_SLOT)/100
             for j in range(num_tasks):
                 output.write("{},{},{},{},{},{},{},{}\n".format(
-                    t[j], lat[j], lng[j], r[j], m, s_in[j],s_out[j],d[j]))
+                    time[j], lat[j], lng[j], r[j], m, s_in[j],s_out[j],d[j]))
                 
         
 

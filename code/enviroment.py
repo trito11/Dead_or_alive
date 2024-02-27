@@ -52,16 +52,28 @@ class BusEnv(gym.Env):
         self.n_actions=NUM_ACTION
         # Không gian state
         self.n_observations=NUM_STATE  
+        
+    #Lấy dữ liệu của xe bus, xử lý rồi đưa nó vào 1 list
+    def load_bus_data(self, num_files=60):
+        data_list = {}
+        for i in range(1, num_files + 1):
+            filename = f"xe_{i}"
+            data_list[filename]=self.preprocessBusLoction(filename)
+        return data_list
+
+    #Lấy dữ liệu xe bus từ file csv trừ đi thời gian min để tất cả bắt đầu từ 0, đưa thời gian về s
     def preprocessBusLoction(self, excel_file):
         #địa chỉ bus
-        a = pd.read_csv(os.path.join(DATA_BUS, excel_file)).to_numpy()
+        a = pd.read_csv(os.path.join(DATA_BUS, excel_file))
         a = a.iloc[:500, [1, 4, 5]]
         a['time'] = a['time'].apply(time_to_seconds)
         min_time=a['time'].min()
         a['time']-=min_time
-        return a
-    def readexcel(self, number_bus, time):
-        #đọc excel tính lat.lng của xe tại t=time
+        return a.to_numpy()
+    
+
+    def readcsv(self, number_bus, time):
+        #đọc excel tính lat,lng của xe tại t=time
         data = self.data_bus[str(number_bus)]
 
         after_time = data[data[:, 1] >= time]
@@ -76,24 +88,66 @@ class BusEnv(gym.Env):
         lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],lng[2],diff2/diff1)
         return lat,lng
 
+
     def seed(self, seed=SEED):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
-    
+
+
     def replay(self):
         # Khởi đâù của iter đặt lại episode về 0
         self.index_of_episode = 0
-        pass
+        self.data_bus=self.load_bus_data()
+
+
+    def reset(self):
+        # Khởi tạo state ban đầu 
+        self.observation=np.zero(NUM_STATE)
+        self.sum_tolerance_time = 0
+        #Đọc dữ liệu từ file task ứng với số rpisode
+        self.data = pd.read_csv(os.path.join(DATA_TASK, "datatask{}.csv".format(
+                self.index_of_episode)), header=None).to_numpy()
+        #Tạo 1 queue lấy các task có cùng time với task ban đầu
+        self.queue = copy.deepcopy(
+                self.data[self.data[:, 0] == self.data[0][0]])
+        # self.queue = self.queue[self.queue[:, 2].argsort()]
+        self.data = self.data[self.data[:, 0] != self.data[0][0]]
+        self.result = []
+        
+        self.time = self.queue[0][0]
+
+        for i in range(NUM_VEHICLE):
+            bus_lat,bus_lng=self.readcsv(f"xe_{i+1}")
+
+            self.observation[2 *
+                                 i + 4] = haversine(bus_lat,bus_lng,self.queue[1],self.queue[2])
+        #Nếu ko phải episode đầu thì trừ hàng chờ đi độ lệch time giữa đít episode trc và đầu episode sau
+        if self.index_of_episode!=0:
+            for i in range(NUM_VEHICLE):
+                self.observation[2 * i + 5] = max(
+                    0, self.observation[2 * i + 5]-(self.time-self.time_last))
+                
+        self.time_last = self.data[-1][0]
+                
+        self.observation[0] = self.queue[0][3] #REQUIRED_GPU_FLOPS
+        self.observation[1] = self.queue[0][5] #s_in
+        self.observation[2] = self.queue[0][6] #s_out
+        self.observation[3] = self.queue[0][7] #deadline
+        
+        # Chỉ đến episode tiếp theo
+        self.index_of_episode +=1
 
     def step(self, action):
-        pass
+        time_delay = 0
+        drop_out=0
+
+
+
         return self.observation, reward, done
         
-    def reset(self):
-        self.observation=np.zero(NUM_STATE)
-        pass
-    # Đến state đầu của episode tiếp theo
-        self.index_of_episode +=1
+    
+    
+        
         return self.observation
     
     def task_distance(self, bus_number,long_task,lat_task,time):
