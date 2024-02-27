@@ -29,6 +29,7 @@ NUM_VEHICLE = 10
 NUM_ACTION = NUM_VEHICLE + 1 # thêm 1 trường hợp bị là loại bỏ
 NUM_STATE = NUM_VEHICLE*2+4 # [[REQUIRED_GPU_FLOPS,s_in,s_out,deadline][cac khoang cach toi xe 1, do dai hang cho xe 1], [tuong tu voi xe 2], ...]
 NUM_TASKS_PER_TIME_SLOT = 800 #Số tác vụ moi time slot la 30s
+EXPECTED_DROP=30
 TIME_EACH_EPISODE = 30 # giay
 NUM_EPISODE = 200
 MIN_NUM_TIME=50
