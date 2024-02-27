@@ -85,8 +85,8 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             m =REQUIRED_GPU_RAM # bộ nhớ tiêu thụ - cấu hình trong file config
 
             #
-            s_in = np.random.randint(MIN_S_IN, MAX_S_IN,NUM_TASKS_PER_TIME_SLOT)
-            s_out = np.random.randint(MIN_S_OUT*10, MAX_S_OUT*10,NUM_TASKS_PER_TIME_SLOT)/10
+            s_in = np.random.randint(MIN_S_IN, MAX_S_IN,NUM_TASKS_PER_TIME_SLOT)/1000 # p in Mb
+            s_out = np.random.randint(MIN_S_OUT*10, MAX_S_OUT*10,NUM_TASKS_PER_TIME_SLOT)/10000 # p out Mb
 
             # deadline
             d = np.random.randint(DEADLINE[0]*100, DEADLINE[1]*100,NUM_TASKS_PER_TIME_SLOT)/100
