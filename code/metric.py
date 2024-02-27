@@ -8,21 +8,23 @@ Tốc độ truyền(channel_banwidth, pr, distance, path_loss_exponent, sigmasq
 
 from math import radians, cos, sin, asin, sqrt
 import numpy as np
-def haversine(lon1, lat1, lon2, lat2):
+def haversine(lat1, lon1, lat2, lon2):
     """
     Calculate the great circle distance between two points 
     on the earth (specified in decimal degrees)
     """
     # convert decimal degrees to radians 
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     # haversine formula 
+    dlat = lat2 - lat1
     dlon = lon2 - lon1 
-    dlat = lat2 - lat1 
     a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
     c = 2 * asin(sqrt(a)) 
     # Radius of earth in kilometers is 6371
-    km = 6371* c
-    return km
+    km = 6371 * c
+    # Convert kilometers to meters
+    m = km * 1000
+    return m
 
 '''
 Toc do truyen ko day
@@ -37,3 +39,10 @@ def getRateTransData(channel_banwidth, pr, distance, path_loss_exponent, sigmasq
 def time_to_seconds(time_str):
     parts = time_str.split(':')
     return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+
+def calculate_intermediate_coordinate(lat1, lng1, lat2, lng2, n):
+    # Tính tọa độ của xe tại thời điểm x theo tỷ lệ n
+    lat = lat1 + n * (lat2 - lat1)
+    lng = lng1 + n * (lng2 - lng1)
+    return lat, lng
+

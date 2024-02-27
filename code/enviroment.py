@@ -60,6 +60,21 @@ class BusEnv(gym.Env):
         min_time=a['time'].min()
         a['time']-=min_time
         return a
+    def readexcel(self, number_bus, time):
+        #đọc excel tính lat.lng của xe tại t=time
+        data = self.data_bus[str(number_bus)]
+
+        after_time = data[data[:, 1] >= time]
+        pre_time = data[data[:, 1] <= time]
+        if len(after_time) == 0:
+            return 1.8
+        las = after_time[0]
+        first = pre_time[-1]
+        diff1=las[0]-first[0]
+        diff2=time-first[0]
+        # weighted average of the distance
+        lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],lng[2],diff2/diff1)
+        return lat,lng
 
     def seed(self, seed=SEED):
         self.np_random, seed = seeding.np_random(seed)
