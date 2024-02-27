@@ -7,7 +7,7 @@ Tốc độ truyền(channel_banwidth, pr, distance, path_loss_exponent, sigmasq
 '''
 
 from math import radians, cos, sin, asin, sqrt
-
+import numpy as np
 def haversine(lon1, lat1, lon2, lat2):
     """
     Calculate the great circle distance between two points 
@@ -32,3 +32,8 @@ def getRateTransData(channel_banwidth, pr, distance, path_loss_exponent, sigmasq
             1 + pr / np.power(distance,path_loss_exponent) / sigmasquare
         )
     ) 
+
+# Hàm chuyển đổi thời gian dạng chuỗi thành giây
+def time_to_seconds(time_str):
+    parts = time_str.split(':')
+    return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])

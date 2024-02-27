@@ -15,6 +15,8 @@ import os
 from pathlib import Path
 from hexagon import get_surrounding_h3
 import h3
+import numpy as np
+import random
 # Tham số truyền thông
 Pr = 46
 P = 39.810  # mW
@@ -36,7 +38,7 @@ MAX_NUM_TIME=200
 LINK_PROJECT = Path(os.path.abspath(__file__))
 LINK_PROJECT = LINK_PROJECT.parent.parent
 DATA_LOCATION = "data/Task_data/data" + str(NUM_TASKS_PER_TIME_SLOT) + "_per_" + str(TIME_EACH_EPISODE)
-DATA_DIR = os.path.join(LINK_PROJECT, "data")
+DATA_BUS = os.path.join(LINK_PROJECT, "data/Bus_data")
 RESULT_DIR = os.path.join(LINK_PROJECT, "result/")
 DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
 
@@ -74,3 +76,5 @@ NEIGHBOR_HEX=get_surrounding_h3(CENTER_H3, NUM_NEIGHBORHOOD)
 #Tham số cho các phân phối
 LAMDA = 5 #Poisson
 SEED=26
+np.random.seed(SEED)
+random.seed(SEED)

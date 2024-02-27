@@ -36,7 +36,7 @@ from gym import spaces
 from gym.utils import seeding
 import copy
 import os
-
+from metric import *
 from config import *
 
 class BusEnv(gym.Env):
@@ -52,7 +52,14 @@ class BusEnv(gym.Env):
         self.n_actions=NUM_ACTION
         # Không gian state
         self.n_observations=NUM_STATE  
-        pass
+    def preprocessBusLoction(self, excel_file):
+        #địa chỉ bus
+        a = pd.read_csv(os.path.join(DATA_BUS, excel_file)).to_numpy()
+        a = a.iloc[:500, [1, 4, 5]]
+        a['time'] = a['time'].apply(time_to_seconds)
+        min_time=a['time'].min()
+        a['time']-=min_time
+        return a
 
     def seed(self, seed=SEED):
         self.np_random, seed = seeding.np_random(seed)
