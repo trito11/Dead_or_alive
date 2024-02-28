@@ -40,6 +40,7 @@ import os
 from metric import *
 from config import *
 from create_data import create_location_task_after
+
 class BusEnv(gym.Env):
     def __init__(self, env=None):
         self.env = env
@@ -60,16 +61,17 @@ class BusEnv(gym.Env):
         self.n_tasks_delay_allocation = [0] * (NUM_ACTION)
 
         self.n_tasks_extra_allocation = [0] * (NUM_ACTION)
+
     #Lấy dữ liệu của xe bus, xử lý rồi đưa nó vào 1 list
     def load_bus_data(self, num_files=60):
         data_list = {}
         for i in range(1, num_files + 1):
             filename = f"xe_{i}"
-            data_list[filename]=self.preprocessBusLoction(filename)
+            data_list[filename]=self.preprocessBusLocation(filename)
         return data_list
 
     #Lấy dữ liệu xe bus từ file csv trừ đi thời gian min để tất cả bắt đầu từ 0, đưa thời gian về s
-    def preprocessBusLoction(self, excel_file):
+    def preprocessBusLocation(self, excel_file):
         #địa chỉ bus
         a = pd.read_csv(os.path.join(DATA_BUS, excel_file))
         a = a.iloc[:500, [1, 4, 5]]
@@ -78,13 +80,12 @@ class BusEnv(gym.Env):
         a['time']-=min_time
         return a.to_numpy()
     
-
     def readcsv(self, number_bus, time):
         #đọc excel tính lat,lng của xe bus tại t=time
         data = self.data_bus[number_bus]
 
-        after_time = data[data[:, 1] >= time]
-        pre_time = data[data[:, 1] <= time]
+        after_time = data[data[:, 0] >= time]
+        pre_time = data[data[:, 0] <= time]
         if len(after_time) == 0:
             return 1.8
         las = after_time[0]
@@ -92,8 +93,8 @@ class BusEnv(gym.Env):
         diff1=las[0]-first[0]
         diff2=time-first[0]
         # weighted average of the distance
-        lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],lng[2],diff2/diff1)
-        return lat,lng
+        lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],las[2],diff2/diff1)
+        return (lat, lng)
 
 
     def seed(self, seed=SEED):
@@ -109,8 +110,12 @@ class BusEnv(gym.Env):
 
     def reset(self):
         # Khởi tạo state ban đầu 
-        self.observation=np.zero(NUM_STATE)
+        self.observation=np.zeros(NUM_STATE)
         self.sum_tolerance_time = 0
+        self.sum_delay=0
+        self.sum_over_time=0
+        self.nstep=0
+        
         #Đọc dữ liệu từ file task ứng với số rpisode
         self.data = pd.read_csv(os.path.join(DATA_TASK, "datatask{}.csv".format(
                 self.index_of_episode)), header=None).to_numpy()
@@ -124,9 +129,9 @@ class BusEnv(gym.Env):
         self.time = self.queue[0][0]
         #Cập nhật khoảng cách đến từng xe 
         for i in range(NUM_VEHICLE):
-            bus_lat,bus_lng=self.readcsv(f"xe_{i+1}",self.time)
+            bus_lat,bus_lng = self.readcsv(f"xe_{i+1}",self.time)
             self.observation[2 *
-                                 i + 4] = haversine(bus_lat,bus_lng,self.queue[1],self.queue[2])
+                                 i + 4] = haversine(bus_lat,bus_lng,self.queue[0][1],self.queue[0][2])
     
         #Nếu ko phải episode đầu thì trừ hàng chờ đi độ lệch time giữa đít episode trc và đầu episode sau
         if self.index_of_episode!=0:
@@ -170,7 +175,7 @@ class BusEnv(gym.Env):
                 f'xe_{action}', new_waiting_queue+self.time)
             
             #Tọa độ người khi đó
-            task_lat,task_lng=create_location_task_after(self.queue[1],self.queue[2],new_waiting_queue)
+            task_lat,task_lng=create_location_task_after(self.queue[0][1],self.queue[0][2],new_waiting_queue)
 
             #Khoang cách lúc sau
             distance_response=haversine(after_lat_bus,after_lng_bus,task_lat,task_lng)
@@ -190,11 +195,11 @@ class BusEnv(gym.Env):
 
 
         self.n_tasks_in_node[action] = self.n_tasks_in_node[action]+1 #Hàm ghi lại các hành động
-        self.n_tasks_delay_allocation[action] += time_delay#Hàm ghi lại tổng delay của mỗi xe
-        self.sum_delay = self.sum_delay + time_delay#tổng delay
+        self.n_tasks_delay_allocation[action] += time_delay #Hàm ghi lại tổng delay của mỗi xe
+        self.sum_delay = self.sum_delay + time_delay #tổng delay
 
 
-        extra_time = self.observation[3] - time_delay#thời gian thừa
+        extra_time = self.observation[3] - time_delay #thời gian thừa
 
         precent_time_finish=extra_time/self.observation[2] #Tỷ lệ thời gian thừa
 
@@ -230,7 +235,7 @@ class BusEnv(gym.Env):
             for i in range(NUM_VEHICLE):
                 bus_lat,bus_lng=self.readcsv(f"xe_{i+1}",self.data[0][0])
                 self.observation[2 *
-                                    i + 4] = haversine(bus_lat,bus_lng,self.queue[1],self.queue[2])
+                                    i + 4] = haversine(bus_lat,bus_lng,self.queue[0][1],self.queue[0][2])
             #Độ lệch thời gian giữa 2 tác vụ
             time = self.data[0][0] - self.time
             #Cập nhật lại các hàng chờ

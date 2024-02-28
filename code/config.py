@@ -70,10 +70,11 @@ DEADLINE = [1.5, 2]
 HEX_CENTER_COORDINATES=(-22.899897051983327, -43.278764907166455)
 HEX_LEVEL=7
 NUM_NEIGHBORHOOD=3
+
 #Lấy mã của ô H3 trung tâm ứng với mức hex_level
 CENTER_H3 = h3.geo_to_h3(HEX_CENTER_COORDINATES[0], HEX_CENTER_COORDINATES[1], HEX_LEVEL)
 #Lấy mã các ô xung quanh
-NEIGHBOR_HEX=get_surrounding_h3(CENTER_H3, NUM_NEIGHBORHOOD)
+NEIGHBOR_HEX = get_surrounding_h3(CENTER_H3, NUM_NEIGHBORHOOD)
 #Tham số cho các phân phối
 LAMDA = 5 #Poisson
 SEED=26
