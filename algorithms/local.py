@@ -17,8 +17,9 @@ Tạo class Agent: đưa ra quyết định chọn hành động nào
     test(): 
     runAC():
 '''
-from itertools import count
-import enviroment as env
+
+from ..system_model import environment as env
+from ..system_model.config import NUM_EPISODE
 
 class Agent_local:
     def __init__(self):
@@ -27,18 +28,20 @@ class Agent_local:
     def select_action(self):
         return 0 # 0 nghĩa là local
     
-    def run(self):
+    def run(self, num_ep = NUM_EPISODE):
         self.env.replay()
         
-        self.state = self.env.reset()
+        for ep in range(num_ep):
+            self.state = self.env.reset()
 
-        done = False
-        step = 0
-        while (not done) and  step in count() :
+            done = False
+            step = 0
+            while (not done) and  (step := step + 1) :
                 self.action = self.select_action()
                 self.state, reward, done = self.env.step(self.action)
-                print(f'Step {step}: {reward}')
+
+            print(f'Episode {ep}, avarage_reward: {self.env.old_avg_reward}\n')
 
 if __name__ == '__main__':
     agent = Agent_local()
-    agent.run()
+    agent.run(num_ep=20)
