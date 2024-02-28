@@ -34,10 +34,10 @@ class Agent_local:
 
         done = False
         step = 0
-        while (not done) and (step in count()) :
-            self.action = self.select_action()
-            self.state, reward, done = self.env.step(self.action)
-            print(f'Step {step}: {reward}')
+        while (not done) and  step in count() :
+                self.action = self.select_action()
+                self.state, reward, done = self.env.step(self.action)
+                print(f'Step {step}: {reward}')
 
 if __name__ == '__main__':
     agent = Agent_local()
