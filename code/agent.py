@@ -29,8 +29,8 @@ class Agent_local:
     
     def run(self):
         self.env.replay()
-        self.env.reset()
-        self.state = self.env.observation
+        
+        self.state = self.env.reset()
 
         done = False
         step = 0

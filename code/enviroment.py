@@ -148,6 +148,8 @@ class BusEnv(gym.Env):
         
         # Chỉ đến episode tiếp theo
         self.index_of_episode +=1
+        #Trả về state đầu tiên
+        return self.observation
 
     def step(self, action):
     #Action là số kiểu int ko phải [] hoặc tensor
