@@ -13,7 +13,7 @@ import folium
 import h3
 import pandas as pd
 import matplotlib.pyplot as plt
-from config import *
+
 
 class Point:
     def __init__(self, lat, lng):

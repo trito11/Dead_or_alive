@@ -39,7 +39,7 @@ import copy
 import os
 from metric import *
 from config import *
-from hexagon import create_location_task_after
+from create_data import create_location_task_after
 class BusEnv(gym.Env):
     def __init__(self, env=None):
         self.env = env
@@ -80,8 +80,8 @@ class BusEnv(gym.Env):
     
 
     def readcsv(self, number_bus, time):
-        #đọc excel tính lat,lng của xe tại t=time
-        data = self.data_bus[str(number_bus)]
+        #đọc excel tính lat,lng của xe bus tại t=time
+        data = self.data_bus[number_bus]
 
         after_time = data[data[:, 1] >= time]
         pre_time = data[data[:, 1] <= time]
@@ -145,7 +145,7 @@ class BusEnv(gym.Env):
         self.index_of_episode +=1
 
     def step(self, action):
-    #Action là số kiểu int ko phải [] hat tensor
+    #Action là số kiểu int ko phải [] hoặc tensor
         time_delay = 0
         drop_out=0
 
