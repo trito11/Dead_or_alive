@@ -13,7 +13,7 @@ import folium
 import h3
 import pandas as pd
 import matplotlib.pyplot as plt
-from config import *
+
 
 class Point:
     def __init__(self, lat, lng):
@@ -176,6 +176,7 @@ def visualize_k_ring(center_lat, center_lng, k,level):
 
     # Hiển thị bản đồ
     return m
+
 #Lấy chỉ số các ô H3 xung quanh
 def get_surrounding_h3(h3_index, k):
     # Sử dụng hàm k_ring để lấy các ô h3 xung quanh

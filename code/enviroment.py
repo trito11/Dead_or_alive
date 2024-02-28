@@ -39,7 +39,8 @@ import copy
 import os
 from metric import *
 from config import *
-from hexagon import create_location_task_after
+from create_data import create_location_task_after
+
 class BusEnv(gym.Env):
     def __init__(self, env=None):
         self.env = env
@@ -60,6 +61,7 @@ class BusEnv(gym.Env):
         self.n_tasks_delay_allocation = [0] * (NUM_ACTION)
 
         self.n_tasks_extra_allocation = [0] * (NUM_ACTION)
+
     #Lấy dữ liệu của xe bus, xử lý rồi đưa nó vào 1 list
     def load_bus_data(self, num_files=60):
         data_list = {}
@@ -78,7 +80,6 @@ class BusEnv(gym.Env):
         a['time']-=min_time
         return a.to_numpy()
     
-
     def readcsv(self, number_bus, time):
         #đọc excel tính lat,lng của xe tại t=time
         data = self.data_bus[str(number_bus)]
@@ -93,7 +94,7 @@ class BusEnv(gym.Env):
         diff2=time-first[0]
         # weighted average of the distance
         lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],lng[2],diff2/diff1)
-        return lat,lng
+        return lat, lng
 
 
     def seed(self, seed=SEED):
@@ -109,7 +110,7 @@ class BusEnv(gym.Env):
 
     def reset(self):
         # Khởi tạo state ban đầu 
-        self.observation=np.zero(NUM_STATE)
+        self.observation=np.zeros(NUM_STATE)
         self.sum_tolerance_time = 0
         #Đọc dữ liệu từ file task ứng với số rpisode
         self.data = pd.read_csv(os.path.join(DATA_TASK, "datatask{}.csv".format(
@@ -124,7 +125,7 @@ class BusEnv(gym.Env):
         self.time = self.queue[0][0]
         #Cập nhật khoảng cách đến từng xe 
         for i in range(NUM_VEHICLE):
-            bus_lat,bus_lng=self.readcsv(f"xe_{i+1}",self.time)
+            bus_lat,bus_lng = self.readcsv(f"xe_{i+1}",self.time)
             self.observation[2 *
                                  i + 4] = haversine(bus_lat,bus_lng,self.queue[1],self.queue[2])
     
@@ -190,11 +191,11 @@ class BusEnv(gym.Env):
 
 
         self.n_tasks_in_node[action] = self.n_tasks_in_node[action]+1 #Hàm ghi lại các hành động
-        self.n_tasks_delay_allocation[action] += time_delay#Hàm ghi lại tổng delay của mỗi xe
-        self.sum_delay = self.sum_delay + time_delay#tổng delay
+        self.n_tasks_delay_allocation[action] += time_delay #Hàm ghi lại tổng delay của mỗi xe
+        self.sum_delay = self.sum_delay + time_delay #tổng delay
 
 
-        extra_time = self.observation[3] - time_delay#thời gian thừa
+        extra_time = self.observation[3] - time_delay #thời gian thừa
 
         precent_time_finish=extra_time/self.observation[2] #Tỷ lệ thời gian thừa
 
