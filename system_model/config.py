@@ -13,7 +13,7 @@ channel_banwidth, pr, distance, path_loss_exponent, sigmasquare
 '''
 import os
 from pathlib import Path
-from hexagon import get_surrounding_h3
+from ..system_model.hexagon import get_surrounding_h3
 import h3
 import numpy as np
 import random

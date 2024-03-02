@@ -17,10 +17,16 @@ Tạo class Agent: đưa ra quyết định chọn hành động nào
     test(): 
     runAC():
 '''
+<<<<<<< HEAD:algorithms/agent.py
 import sys
 sys.path.append('D:\Lab\Lab_project\Dead_or_alive\system_model')
 from itertools import count
 import enviroment as env
+=======
+
+from ..system_model import environment as env
+from ..system_model.config import NUM_EPISODE
+>>>>>>> fa5428f5f037e48cfa3760e4927c3461f55db0a1:algorithms/local.py
 
 class Agent_local:
     def __init__(self):
@@ -29,18 +35,20 @@ class Agent_local:
     def select_action(self):
         return 0 # 0 nghĩa là local
     
-    def run(self):
+    def run(self, num_ep = NUM_EPISODE):
         self.env.replay()
         
-        self.state = self.env.reset()
+        for ep in range(num_ep):
+            self.state = self.env.reset()
 
-        done = False
-        step = 0
-        while (not done) and  step in count() :
+            done = False
+            step = 0
+            while (not done) and  (step := step + 1) :
                 self.action = self.select_action()
                 self.state, reward, done = self.env.step(self.action)
-                print(f'Step {step}: {reward}')
+
+            print(f'Episode {ep}, avarage_reward: {self.env.old_avg_reward}\n')
 
 if __name__ == '__main__':
     agent = Agent_local()
-    agent.run()
+    agent.run(num_ep=20)

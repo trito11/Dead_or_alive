@@ -37,9 +37,9 @@ from gym import spaces
 from gym.utils import seeding
 import copy
 import os
-from metric import *
-from config import *
-from create_data import create_location_task_after
+from ..system_model.metric import *
+from ..system_model.config import *
+from ..system_model.create_data import create_location_task_after
 
 class BusEnv(gym.Env):
     def __init__(self, env=None):
@@ -307,15 +307,3 @@ class BusEnv(gym.Env):
             self.sum_delay = 0
 
         return self.observation, reward, done, 
-        
-    
-    
-
-    
-
-    
-
-
-    
-
-

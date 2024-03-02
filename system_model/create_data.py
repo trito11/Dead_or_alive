@@ -16,7 +16,7 @@ create_location_task_after(lat,lng,time)=>new lat, lng
     Tọa độ dịch chuyển theo 1 vector: hướng bất kỳ, độ dài=vận tốc*time, vận tốc ngẫu nhiên(0-40km/h) 
 '''
 
-from config import *
+from ..system_model.config import *
 import random
 import pandas as pd
 import math
@@ -25,7 +25,7 @@ import h3
 import numpy as np
 import os
 from pathlib import Path
-from hexagon import create_point
+from ..system_model.hexagon import create_point
 
 path = os.path.abspath(__file__)
 path = Path(path).parent.parent

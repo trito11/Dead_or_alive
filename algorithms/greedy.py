@@ -1,51 +1,33 @@
-from itertools import count
-import sys
-sys.path.append('D:\Lab\Lab_project\Dead_or_alive\system_model')
-import environment as env
-from config import *
-import torch
-class DQNAgent:
-    def __init__(self) :
-        self.env=env.BusEnv()
-        self.optimize=0
-        self.env.seed(123)
-        self.batch_size=2
-        self.n_actions=NUM_ACTION
-        self.n_observations=NUM_STATE
+from ..system_model import environment as env
+from ..system_model.config import NUM_EPISODE
+import numpy as np
 
-    def select_action(self,state,greedy):
-        if greedy=='queue':
-            action=1
-            queue=state[5]
-            for i in range(1,NUM_VEHICLE):
-                if state[i*2+5]<=queue:
-                    action=i+1
-                    queue=state[i*2+5]
-            return action
-        if greedy=='distance':
-            action=1
-            distance=state[4]
-            for i in range(1,NUM_VEHICLE):
-                if state[i*2+4]<distance:
-                    action=i+1
-                    distance=state[i*2+4]
-            return action
- 
-    def run(self,greedy):
+class Agent_greedy_nearest:
+    def __init__(self):
+        self.env = env.BusEnv()
+
+    # chon xe gan nhat
+    def select_action(self):
+        distances_to_bus = self.env.observation[4::2]
+        print(distances_to_bus)
+        print(min(distances_to_bus))
+        print(np.argmin(distances_to_bus) + 1)
+        return int(np.argmin(distances_to_bus)) + 1
+    
+    def run(self, num_ep = NUM_EPISODE):
         self.env.replay()
-        for episode in range(10):
-            state = self.env.reset()
+        
+        for ep in range(num_ep):
+            self.state = self.env.reset()
+
             done = False
-            while not done:
-                for i in count():
-                    action = self.select_action(state,greedy)
-                    next_state, reward, done= self.env.step(action)
-                    if done:
-                        next_state = None
-                        print('Episode: {}, Score: {}'.format(
-                            episode, self.env.old_avg_reward))
-                        break
-                    state = next_state
+            step = 0
+            while (not done) and  (step := step + 1) :
+                self.action = self.select_action()
+                self.state, reward, done = self.env.step(self.action)
+
+            print(f'Episode {ep}, avarage_reward: {self.env.old_avg_reward}\n')
+
 if __name__ == '__main__':
-    Agent=DQNAgent()
-    Agent.run('distance')
+    agent = Agent_greedy_nearest()
+    agent.run(num_ep=2)
