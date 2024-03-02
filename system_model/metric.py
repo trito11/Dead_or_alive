@@ -23,8 +23,8 @@ def haversine(lat1, lon1, lat2, lon2):
     # Radius of earth in kilometers is 6371
     km = 6371 * c
     # Convert kilometers to meters
-    m = km * 1000
-    return m
+    
+    return km
 
 '''
 Toc do truyen ko day
@@ -40,9 +40,28 @@ def time_to_seconds(time_str):
     parts = time_str.split(':')
     return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
 
-def calculate_intermediate_coordinate(lat1, lng1, lat2, lng2, n):
+def calculate_intermediate_coordinate(lat1, lon1, lat2, lon2, ratio):
     # Tính tọa độ của xe tại thời điểm x theo tỷ lệ n
-    lat = lat1 + n * (lat2 - lat1)
-    lng = lng1 + n * (lng2 - lng1)
-    return lat, lng
+    constant = np.pi / 180
+    R = 6371
+    φ1 = lat1 * constant
+    λ1 = lon1 * constant
+    φ2 = lat2 * constant
+    λ2 = lon2 * constant
+    
+    delta = np.arccos(np.sin(φ1) * np.sin(φ2) + np.cos(φ1) * np.cos(φ2) * np.cos(λ2 - λ1))  # Great circle distance
+    d = R * delta  # Distance between two points
+    
+    d *= ratio  # Scale the distance
+    
+    y = np.sin(λ2 - λ1) * np.cos(φ2)
+    x = np.cos(φ1) * np.sin(φ2) - np.sin(φ1) * np.cos(φ2) * np.cos(λ2 - λ1)
+    θ = np.arctan2(y, x)
+    brng = (θ * 180 / np.pi + 360) % 360  # in degrees
+    brng = brng * constant
+
+    φ3 = np.arcsin(np.sin(φ1) * np.cos(d / R) + np.cos(φ1) * np.sin(d / R) * np.cos(brng))
+    λ3 = λ1 + np.arctan2(np.sin(brng) * np.sin(d / R) * np.cos(φ1), np.cos(d / R) - np.sin(φ1) * np.sin(φ3))
+
+    return φ3 / constant, λ3 / constant
 

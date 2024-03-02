@@ -17,6 +17,8 @@ Tạo class Agent: đưa ra quyết định chọn hành động nào
     test(): 
     runAC():
 '''
+import sys
+sys.path.append('D:\Lab\Lab_project\Dead_or_alive\system_model')
 from itertools import count
 import enviroment as env
 

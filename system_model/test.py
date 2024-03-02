@@ -21,6 +21,7 @@ def load_bus_data( num_files=60):
 def preprocessBusLocation( excel_file):
     #địa chỉ bus
     a = pd.read_csv(os.path.join(DATA_BUS, excel_file))
+    a['hex'] = a.apply(lambda x: h3.geo_to_h3(x.latitude,x.longitude,7),1)
     a = a.iloc[:500, [1, 4, 5]]
     a['time'] = a['time'].apply(time_to_seconds)
     min_time=a['time'].min()
@@ -44,6 +45,8 @@ def readcsv( number_bus, time):
     lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],las[2],diff2/diff1)
     return lat, lng
 
-ata_bus=load_bus_data()
-a,b=readcsv( 'xe_59', 260.5647)
-print(a,b)
+# data_bus=preprocessBusLocation('xe_1')
+a = pd.read_csv(os.path.join(DATA_BUS, 'xe_1'))
+a['hex'] = a.apply(lambda x: h3.geo_to_h3(x.latitude,x.longitude,7),1)
+a = a[a['hex'].isin(NEIGHBOR_HEX)]
+print(a)

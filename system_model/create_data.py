@@ -30,6 +30,22 @@ from hexagon import create_point
 path = os.path.abspath(__file__)
 path = Path(path).parent.parent
 
+def get_random(arr, so_lan_lay):
+    # Tạo một mảng chứa chỉ số của các phần tử trong mảng arr
+    indices = list(range(len(arr)))
+    # Mảng kết quả
+    result = []
+    
+    for _ in range(so_lan_lay):
+        # Chọn ngẫu nhiên một chỉ số từ mảng indices
+        index = random.choice(indices)
+        # Lấy phần tử tương ứng và thêm vào mảng kết quả
+        result.append(arr[index])
+        # Xóa chỉ số đã chọn khỏi mảng indices để tránh lấy lại
+        del indices[index]
+    
+    return result
+
 def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EACH_EPISODE, num = NUM_EPISODE):
     data_location = "{}/{}".format(str(path), DATA_LOCATION)
     if not os.path.exists(data_location):
@@ -38,6 +54,8 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
     for i in range(NUM_EPISODE):
         with open("{}/{}/datatask{}.csv".format(str(path), DATA_LOCATION, i), "w") as output:
             columns = ['time', 'lat', 'long', 'require', 'dung_luong_bo_nho_yeu_cau', 'kich_thuoc_du_lieu_vao', 'kich_thuoc_du_lieu_ra', 'deadline']
+            latitude=[]
+            longtitude=[]
             lat=[]
             lng=[]
             #30s mình sinh ra ngẫu nhiên x khe thời gian đang sinh theo phân phối uniform
@@ -45,8 +63,10 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
             #Sinh thời gian ứng với x khe thời gian
             t = np.sort(np.random.randint(i*100*time_each_episode,(i+1)*100*time_each_episode,num_time)/100) #Thời gian các task xuất hiện
             time=[]
-            #Sinh số lượng task theo phân phối poisson trong từng khe thời gian
-            tasks_per_interval = np.random.poisson(NUM_TASKS_PER_TIME_SLOT / num_time, num_time)
+            #Sinh số lượng task theo phân phối poisson trong từng ô h3
+            location_per_interval = np.random.poisson(LAMDA, 10)
+            tasks_per_interval = np.random.poisson(num_tasks/num_time, num_time)
+
             total_generated_tasks = np.sum(tasks_per_interval)
 
             # Tính số lượng tác vụ thừa
@@ -67,18 +87,29 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
                     excess_tasks += 1
             #Poisson process point
             # tạo tọa độ
-            #Lặp cho từng khe thời gian thì lấy ngẫu nhiên 1 ô H3
+            k=0
+            for index in NEIGHBOR_HEX:
+                num_location=location_per_interval[k]
+                hex_boundary = h3.h3_to_geo_boundary(index) # array of arrays of [lat, lng]
+                #Sinh tọa độ ngẫu nhiên trong ô h3 với từng task 
+                for j in range(num_location):
+                    point=create_point(hex_boundary)
+                    latitude.append(point.lat)
+                    longtitude.append(point.lng)
+                k+=1
+            a=len(latitude)
             for i in range(num_time):
                 num_task=tasks_per_interval[i]
-                random_index=random.choice(list(NEIGHBOR_HEX))
-                hex_boundary = h3.h3_to_geo_boundary(random_index) # array of arrays of [lat, lng]
-                #Sinh tọa độ ngẫu nhiên trong ô h3 với từng task 
-                for j in range(num_task):
-                    point=create_point(hex_boundary)
-                    lat.append(point.lat)
-                    lng.append(point.lng)
+                for j in range (num_task):
                     time.append(t[i])
-            
+                    b=random.randint(0,a-1)
+                    lat.append(latitude[b])
+                    lng.append(longtitude[b])
+
+
+            print(len(lat))
+            print(num_task)
+            print(len(time))
             # lượng tài nguyên cần thiết - cấu hình trong trong file config
             r = np.random.randint(REQUIRED_GPU_FLOPS[0], REQUIRED_GPU_FLOPS[1],NUM_TASKS_PER_TIME_SLOT)
             # 
@@ -115,7 +146,7 @@ def move_random(latitude, longitude, distance_meters):
 
 
 def create_location_task_after(lat,lng,time):
-    speed = random.uniform(0,3)
+    speed = random.uniform(0,2)
     index=h3.geo_to_h3(lat,lng,HEX_LEVEL)
     while True:
         new_lat,new_lng=move_random(lat,lng,speed*time)

@@ -31,9 +31,9 @@ NUM_STATE = NUM_VEHICLE*2+4 # [[REQUIRED_GPU_FLOPS,s_in,s_out,deadline][cac khoa
 NUM_TASKS_PER_TIME_SLOT = 800 #Số tác vụ moi time slot la 30s
 EXPECTED_DROP=30
 TIME_EACH_EPISODE = 30 # giay
-NUM_EPISODE = 200
-MIN_NUM_TIME=50
-MAX_NUM_TIME=200
+NUM_EPISODE = 100
+MIN_NUM_TIME=200
+MAX_NUM_TIME=300
 
 # Đường dẫn lưu trữ file
 LINK_PROJECT = Path(os.path.abspath(__file__))
@@ -49,13 +49,15 @@ DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
 
 
 REQUIRED_CPU_CYCLE = 400  
-REQUIRED_GPU_FLOPS = [1000, 1500] # đơn vị là GFLOPs
+REQUIRED_GPU_FLOPS = [2500, 3000] # đơn vị là GFLOPs
 IMAGE_RECOGNITION = 0.615 # đơn vị là GFLOPs
 BUS_OBJECT_DTECTION= 6586 #Lâu lâu xe bus nhận diện biển báo trên đường
-PROCESSING_POWER=12134 # đơn vị là GFLOPS của GTX 4050
+# PROCESSING_POWER=12134 # đơn vị là GFLOPS của GTX 4050
+PROCESSING_POWER=82580 # đơn vị là GFLOPS của GTX 4090
 REQUIRED_GPU_RAM=1782.56 #Đơn vị là MB
 GPU_RAM_BUS=16 #GB RAM của GTX 4050
-MOBIE_GPU_FLOPS=171.26 # đơn vị là GFLOPS của Apple A15 Bionic
+MOBIE_GPU_FLOPS=1712.6 # đơn vị là GFLOPS của Apple A15 Bionic
+NPU_FLOPS=610.6 # đơn vị là GFLOPS của Rockchip RK3588
 #
 MIN_S_IN = 400 # KB
 MAX_S_IN = 500
@@ -69,14 +71,14 @@ DEADLINE = [1.5, 2]
 #Thông số về tọa độ mô hình h3
 HEX_CENTER_COORDINATES=(-22.899897051983327, -43.278764907166455)
 HEX_LEVEL=7
-NUM_NEIGHBORHOOD=3
+NUM_NEIGHBORHOOD=2
 
 #Lấy mã của ô H3 trung tâm ứng với mức hex_level
 CENTER_H3 = h3.geo_to_h3(HEX_CENTER_COORDINATES[0], HEX_CENTER_COORDINATES[1], HEX_LEVEL)
 #Lấy mã các ô xung quanh
-NEIGHBOR_HEX = get_surrounding_h3(CENTER_H3, NUM_NEIGHBORHOOD)
+NEIGHBOR_HEX = {'87a8a0613ffffff', '87a8a060affffff', '87a8a0611ffffff', '87a8a0618ffffff', '87a8a060effffff', '87a8a061cffffff', '87a8a061dffffff',  '87a8a0619ffffff', '87a8a061effffff'}
 #Tham số cho các phân phối
-LAMDA = 5 #Poisson
+LAMDA = 100 #Poisson
 SEED=26
 np.random.seed(SEED)
 random.seed(SEED)
