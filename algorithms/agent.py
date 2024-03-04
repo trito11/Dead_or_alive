@@ -17,39 +17,9 @@ Tạo class Agent: đưa ra quyết định chọn hành động nào
     test(): 
     runAC():
 '''
-import sys
-import os
 from pathlib import Path
-link=Path(os.path.abspath(__file__))
-link=link.parent.parent
-link=os.path.join(link, "system_model")
-sys.path.append(link)
-from itertools import count
-import environment as env
-
-
-
-class Agent_local:
-    def __init__(self):
-        self.env = env.BusEnv()
-
-    def select_action(self):
-        return 0 # 0 nghĩa là local
-    
-    def run(self, num_ep = NUM_EPISODE):
-        self.env.replay()
-        
-        for ep in range(num_ep):
-            self.state = self.env.reset()
-
-            done = False
-            step = 0
-            while (not done) and  (step := step + 1) :
-                self.action = self.select_action()
-                self.state, reward, done = self.env.step(self.action)
-
-            print(f'Episode {ep}, avarage_reward: {self.env.old_avg_reward}\n')
-
-if __name__ == '__main__':
-    agent = Agent_local()
-    agent.run(num_ep=20)
+import os
+a=Path(os.path.abspath(__file__))
+a=a.parent.parent
+b=os.path.join(a, "system_model")
+print(b)

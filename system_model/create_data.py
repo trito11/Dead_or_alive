@@ -15,8 +15,7 @@ create_location_task_after(lat,lng,time)=>new lat, lng
     Tạo vị trí mới của người dùng sau x time từ vị trí ban đầu, xác định vị trí để gửi trả kết quả sau x time xử lý 
     Tọa độ dịch chuyển theo 1 vector: hướng bất kỳ, độ dài=vận tốc*time, vận tốc ngẫu nhiên(0-40km/h) 
 '''
-
-from ..system_model.config import *
+from config import *
 import random
 import pandas as pd
 import math
@@ -25,7 +24,7 @@ import h3
 import numpy as np
 import os
 from pathlib import Path
-from ..system_model.hexagon import create_point
+from hexagon import create_point
 
 path = os.path.abspath(__file__)
 path = Path(path).parent.parent
@@ -108,7 +107,7 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
 
 
             print(len(lat))
-            print(num_task)
+            print(num_tasks)
             print(len(time))
             # lượng tài nguyên cần thiết - cấu hình trong trong file config
             r = np.random.randint(REQUIRED_GPU_FLOPS[0], REQUIRED_GPU_FLOPS[1],NUM_TASKS_PER_TIME_SLOT)

@@ -1,5 +1,10 @@
 import sys
-sys.path.append('D:\Lab\Lab_project\Dead_or_alive\system_model')
+import os
+from pathlib import Path
+link=Path(os.path.abspath(__file__))
+link=link.parent.parent
+link=os.path.join(link, "system_model")
+sys.path.append(link)
 import numpy as np
 import torch
 import gym

@@ -8,6 +8,7 @@ Tốc độ truyền(channel_banwidth, pr, distance, path_loss_exponent, sigmasq
 
 from math import radians, cos, sin, asin, sqrt
 import numpy as np
+import random
 def haversine(lat1, lon1, lat2, lon2):
     """
     Calculate the great circle distance between two points 
