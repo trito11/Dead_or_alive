@@ -40,6 +40,7 @@ import os
 from metric import *
 from config import *
 from create_data import create_location_task_after
+from MyGlobal import MyGlobals
 
 class BusEnv(gym.Env):
     def __init__(self, env=None):
@@ -50,15 +51,55 @@ class BusEnv(gym.Env):
         # Tổng phần thưởng
         self.sum_reward = 0
         # Số phần thưởng đã nhận
-        self.nreward = 0
+        
         # Không gian hành động
         self.n_actions=NUM_ACTION
         # Không gian state
         self.n_observations=NUM_STATE  
+
+        try:
+            os.makedirs(RESULT_DIR + MyGlobals.folder_name)
+            print(MyGlobals.folder_name)
+        except OSError as e:
+            print(e)
         
+        self.reward_files = open(
+            RESULT_DIR + MyGlobals.folder_name + "reward.csv", "w")
+        self.over_time_files = open(
+            RESULT_DIR + MyGlobals.folder_name+ "over_time_task.csv", "w")
+        self.delay_files = open(
+            RESULT_DIR + MyGlobals.folder_name+ "delay.csv", "w")
+        self.server_allocation = open(
+            RESULT_DIR + MyGlobals.folder_name+ "server_allocation.csv", "w")
+        self.delay_allocation = open(
+            RESULT_DIR + MyGlobals.folder_name+ "delay_allocation.csv", "w")
+        self.extra_allocation = open(
+            RESULT_DIR + MyGlobals.folder_name+ "extra_allocation.csv", "w")
+        self.tolerance_time_files = open(
+            RESULT_DIR + MyGlobals.folder_name+ "sum_tolerance_time.csv", "w")
+        
+        tempstr = "local"
+        for i in range(1, NUM_VEHICLE):
+            tempstr += ",xe_" + str(i)
+        
+        self.server_allocation.write(tempstr + '\n')
+        self.delay_allocation.write(tempstr + '\n')
+        self.extra_allocation.write(tempstr + '\n')
+        
+        self.reward_files.write('reward,reward_accumulate\n')
+        self.over_time_files.write('drop\n')
+        self.delay_files.write('delay,delay_avg\n')
+        self.tolerance_time_files.write('sum_tolerance_time\n')
+
+        self.sum_reward = 0
+        self.sum_reward_accumulate = 0
+        self.sum_over_time = 0
+        self.sum_delay = 0
+        self.nreward = 0
+        self.nstep = 0
 
     #Lấy dữ liệu của xe bus, xử lý rồi đưa nó vào 1 list
-    def load_bus_data(self, num_files=60):
+    def load_bus_data(self, num_files=14):
         data_list = {}
         for i in range(1, num_files + 1):
             filename = f"xe_{i}"
@@ -163,6 +204,7 @@ class BusEnv(gym.Env):
         if action > 0:
             #khoảng cách yêu cầu
             distance_req = self.observation[(action)*2+2]
+            # print(self.observation[5:23:2])
             # print(f"Khoang cach:{distance_req}")
             #hàng đợi cũ
             old_waiting_queue = self.observation[3+(action)*2]
@@ -170,7 +212,7 @@ class BusEnv(gym.Env):
             Rate_trans_req_data = getRateTransData(channel_banwidth=CHANNEL_BANDWIDTH, pr=Pr, distance=distance_req,
                                                    path_loss_exponent=PATH_LOSS_EXPONENT, sigmasquare=SIGMASquare)
             #thời gian truyền đi
-            # print(f"Thoi gian truyen{self.observation[1]/(Rate_trans_req_data)}")
+            # print(f"Thoi gian truyen{self.observation[1]/(Rate_trans_req_data)}/n")
         
 
             # waiting queue                        # computation required / computation
@@ -197,7 +239,8 @@ class BusEnv(gym.Env):
         #nếu drop thì xử lý tại local
         else:
             drop_out=1 
-            time_delay = self.observation[0]/MOBIE_GPU_FLOPS
+            mobie_flops=random.randint(MOBIE_GPU_FLOPS_MIN,MOBIE_GPU_FLOPS_MAX)
+            time_delay = self.observation[0]/mobie_flops
 
 
         self.n_tasks_in_node[action] = self.n_tasks_in_node[action]+1 #Hàm ghi lại các hành động
@@ -207,7 +250,7 @@ class BusEnv(gym.Env):
 
         extra_time = self.observation[3] - time_delay #thời gian thừa
 
-        precent_time_finish=extra_time/self.observation[2] #Tỷ lệ thời gian thừa
+        precent_time_finish=extra_time/self.observation[3] #Tỷ lệ thời gian thừa
 
         #tính toán phần thưởng
         reward_drop=-drop_out/EXPECTED_DROP
@@ -275,30 +318,29 @@ class BusEnv(gym.Env):
         #Ghi kết quả  ra các file
 
             
-            # tempstr = ','.join([str(elem) for elem in self.n_tasks_in_node])
-            # self.server_allocation.write(tempstr+"\n")
-            # tempstr = ','.join([str(elem/nb_step) if nb_step else '0' for elem, nb_step in zip(
-            #     self.n_tasks_delay_allocation, self.n_tasks_in_node)])
+            tempstr = ','.join([str(elem) for elem in self.n_tasks_in_node])
+            self.server_allocation.write(tempstr+"\n")
+            tempstr = ','.join([str(elem/nb_step) if nb_step else '0' for elem, nb_step in zip(
+                self.n_tasks_delay_allocation, self.n_tasks_in_node)])
             
-            # self.delay_allocation.write(tempstr+"\n")
+            self.delay_allocation.write(tempstr+"\n")
 
-            # tempstr = ','.join([str(elem/nb_step) if nb_step else '0' for elem, nb_step in zip(
-            #     self.n_tasks_extra_allocation, self.n_tasks_in_node)])
-            # self.extra_allocation.write(tempstr+"\n")
-            # tempstr = ','.join([str(elem) for elem in self.n_tasks_sum_extra_allocation])
-            # self.sum_extra_allocation.write(tempstr+"\n")
+            tempstr = ','.join([str(elem/nb_step) if nb_step else '0' for elem, nb_step in zip(
+                self.n_tasks_extra_allocation, self.n_tasks_in_node)])
+            self.extra_allocation.write(tempstr+"\n")
             
-            # # sum_tolerance time
-            # self.tolerance_time_files.write(str(self.sum_tolerance_time)+"\n")
+            
+            # sum_tolerance time
+            self.tolerance_time_files.write(str(self.sum_tolerance_time)+"\n")
 
-            # # check end of program? to close files
-            # avg_reward = self.sum_reward/self.nstep
-            # avg_reward_accumulate = self.sum_reward_accumulate/self.nreward
-            # self.reward_files.write(
-            #     str(avg_reward)+','+str(avg_reward_accumulate)+"\n")
-            # self.over_time_files.write(str(self.sum_over_time/self.nstep)+"\n")
-            # self.delay_files.write(
-            #     str(self.sum_delay)+','+str(self.sum_delay/self.nstep)+"\n")
+            # check end of program? to close files
+            avg_reward = self.sum_reward/self.nstep
+            avg_reward_accumulate = self.sum_reward_accumulate/self.nreward
+            self.reward_files.write(
+                str(avg_reward)+','+str(avg_reward_accumulate)+"\n")
+            self.over_time_files.write(str(self.sum_over_time/self.nstep)+"\n")
+            self.delay_files.write(
+                str(self.sum_delay)+','+str(self.sum_delay/self.nstep)+"\n")
 
             self.old_avg_reward = self.sum_reward/self.nstep
             self.sum_reward = 0

@@ -17,7 +17,7 @@ import environment as env
 
 from config import *
 import copy
-
+from MyGlobal import MyGlobals
 from itertools import count
 from torch.distributions import Categorical
 import random
@@ -67,37 +67,46 @@ class DQNAgent:
         self.env=env.BusEnv()
         self.optimize=0
         self.env.seed(123)
-        self.batch_size=128
-        self.eps_start=0.9
+        self.batch_size=256
+        self.eps_start=0.5
         self.eps_end=0.05
         self.eps_decay=1000
-        self.tau_start=0.5
-        self.tau_end=0.01
         self.tau_decay=1000
-        self.tau1=0.05
-        self.tau2=0.
+        self.tau=0.01
         self.lr=1e-4
         self.n_actions=NUM_ACTION
         self.n_observations=NUM_STATE
-        self.policy_net=DQNnet(self.n_observations,self.n_actions).to(device)
-        self.target_net=DQNnet(self.n_observations,self.n_actions).to(device)
-        self.save_net=DQNnet(self.n_observations,self.n_actions).to(device)
+        self.policy_net=DQNnet(self.n_observations,self.n_actions-1).to(device)
+        self.target_net=DQNnet(self.n_observations,self.n_actions-1).to(device)
+        
         self.target_net.load_state_dict(self.policy_net.state_dict())
-        self.save_net.load_state_dict(self.policy_net.state_dict())
         self.optimizer=optim.AdamW(self.policy_net.parameters(),lr=self.lr,amsgrad=True)
         self.memory=ReplayMemory(10000)
         self.stepdone=0
         self.stepdone1=0
+    def normalize(self, state):
+        array = torch.zeros(1,24)
+        array[0][0] = (state[0][0] - REQUIRED_GPU_FLOPS[0]) / (REQUIRED_GPU_FLOPS[1] - REQUIRED_GPU_FLOPS[0])
+        array[0][1] = (state[0][1] - MIN_S_IN) / (MAX_S_IN - MIN_S_IN)
+        array[0][2] = (state[0][2] - MIN_S_OUT) / (MAX_S_OUT - MIN_S_OUT)
+        array[0][3] = (state[0][3] - DEADLINE[0]) / (DEADLINE[1] - DEADLINE[0])
+        for i in range(NUM_VEHICLE):
+            array[0][i * 2 + 4] = state[0][i * 2 + 4] / 8
+            array[0][i * 2 + 5] = state[0][i * 2 + 5] / 300
+        return array
+
+        
+        
     def select_action(self,state):
             sample=random.random()
             eps_threshold=self.eps_end+(self.eps_start-self.eps_end)*math.exp(-1.*self.stepdone/self.eps_decay)
-            self.stepdone+=0.05
+            self.stepdone+=0.005
             if sample > eps_threshold:
                 with torch.no_grad():
                     return self.policy_net(state).max(-1)[1].view(1, 1)
             else:
-                return torch.tensor([[random.randint(0,NUM_ACTION-1)]], device=device, dtype=torch.long)    
-
+                return torch.tensor([[random.randint(0,NUM_ACTION-2)]], device=device, dtype=torch.long)    
+    
     def optimize_model(self,gamma):
             # self.start_time=time.time()
             if len(self.memory) < self.batch_size:
@@ -124,8 +133,8 @@ class DQNAgent:
 
             next_state_values = torch.zeros(self.batch_size, device=device)
             with torch.no_grad():
-                 next_state_values[non_final_mask] =self.target_net(non_final_next_states).max(1)[0]
-                # next_state_values[non_final_mask] =self.policy_net(non_final_next_states).gather(1,self.target_net(non_final_next_states).max(1)[1].unsqueeze(0))
+                #  next_state_values[non_final_mask] =self.target_net(non_final_next_states).max(1)[0]
+                next_state_values[non_final_mask] =self.policy_net(non_final_next_states).gather(1,self.target_net(non_final_next_states).max(1)[1].unsqueeze(0))
                 
             # Compute the expected Q values
             expected_state_action_values = (next_state_values * gamma) + reward_batch
@@ -150,33 +159,38 @@ class DQNAgent:
                 self.env.replay()
                 for episode in range(num_episodes):
                     state = self.env.reset()
+                    state=torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
                     done = False
                     while not done:
                         for i in count():
-                            state = torch.FloatTensor(state).to(device)
+                            state=self.normalize(state)
+                            
                             action = self.select_action(state)
                             action1=action.item()
-                            next_state, reward, done= self.env.step(np.array(action1))
+                            next_state, reward, done= self.env.step(np.array(action1+1))
+                            # print(next_state)
                             reward = torch.tensor([reward], device=device)
                             if done:
-                                if (self.env.old_avg_reward < -100000):
+                                if (self.env.old_avg_reward < -1000):
                                     return
                                 next_state = None
                                 print('Episode: {}, Score: {}'.format(
                                     episode, self.env.old_avg_reward))
                                 break 
                             next_state = torch.tensor(next_state, dtype=torch.float32, device=device).unsqueeze(0)
+                            
+                            next_state=self.normalize(next_state)
                             self.memory.push(state, action, next_state, reward)
                             state = next_state
 
                             self.optimize_model(gamma)
-                            self.tau=self.tau_end+(self.tau_start-self.tau_end)*math.exp(-1.*self.stepdone1/self.tau_decay)
+                            
                             target_net_state_dict = self.target_net.state_dict()
                             policy_net_state_dict = self.policy_net.state_dict()
                             for key in policy_net_state_dict:
-                                target_net_state_dict[key] = policy_net_state_dict[key]*self.tau1 + target_net_state_dict[key]*(1-self.tau1)
+                                target_net_state_dict[key] = policy_net_state_dict[key]*self.tau + target_net_state_dict[key]*(1-self.tau)
                                 
-                            self.policy_net.load_state_dict(target_net_state_dict)
+                            self.target_net.load_state_dict(target_net_state_dict)
 
     def test(self,num_episodes):
             
@@ -188,7 +202,7 @@ class DQNAgent:
 
                 while not done:
                     state = torch.FloatTensor(state).to(device)
-                    action=action = self.select_action(state)
+                    action= self.select_action(state)
                     action1=action.item()
                     next_state, reward, done,= self.env.step(np.array(action1))
 
@@ -196,11 +210,10 @@ class DQNAgent:
 
                 print('Test Episode: {}, Score: {}'.format(episode, self.env.old_avg_reward))
     def runAC(self,gamma):
-    # MyGlobals.folder_name = "Actor_Critic_800_30s/dur" + str(dur) + "/" + str(i) +'/'
-        
-        self.train(num_iters=9, num_episodes=121,
+        MyGlobals.folder_name = "RL/"
+        self.train(num_iters=1, num_episodes=90,
             gamma=gamma )
-        self.test( num_episodes=60, )
+        self.test( num_episodes=10, )
 
 Agent=DQNAgent()
 Agent.runAC(0.99)

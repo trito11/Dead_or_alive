@@ -26,7 +26,7 @@ PATH_LOSS_EXPONENT = 4
 
 # Tham số về mô hình
 NUM_VEHICLE = 10
-NUM_ACTION = NUM_VEHICLE + 1 # thêm 1 trường hợp bị là loại bỏ
+NUM_ACTION = NUM_VEHICLE +1 # thêm 1 trường hợp bị là loại bỏ
 NUM_STATE = NUM_VEHICLE*2+4 # [[REQUIRED_GPU_FLOPS,s_in,s_out,deadline][cac khoang cach toi xe 1, do dai hang cho xe 1], [tuong tu voi xe 2], ...]
 NUM_TASKS_PER_TIME_SLOT = 800 #Số tác vụ moi time slot la 30s
 EXPECTED_DROP=30
@@ -42,6 +42,7 @@ DATA_LOCATION = "data/Task_data/data" + str(NUM_TASKS_PER_TIME_SLOT) + "_per_" +
 DATA_BUS = os.path.join(LINK_PROJECT, "data/Bus_data")
 RESULT_DIR = os.path.join(LINK_PROJECT, "result/")
 DATA_TASK = os.path.join(LINK_PROJECT, DATA_LOCATION)
+FOLDER_NAME="None"
 
 # Tốc độ xử lý và yêu cầu tài nguyên của các loại task
 # https://doi.org/10.1109/TMC.2020.2994232
@@ -56,7 +57,8 @@ BUS_OBJECT_DTECTION= 6586 #Lâu lâu xe bus nhận diện biển báo trên đư
 PROCESSING_POWER=82580 # đơn vị là GFLOPS của GTX 4090
 REQUIRED_GPU_RAM=1782.56 #Đơn vị là MB
 GPU_RAM_BUS=16 #GB RAM của GTX 4050
-MOBIE_GPU_FLOPS=1712.6 # đơn vị là GFLOPS của Apple A15 Bionic
+MOBIE_GPU_FLOPS_MIN=37
+MOBIE_GPU_FLOPS_MAX=127 # đơn vị là GFLOPS của Apple A15 Bionic
 NPU_FLOPS=610.6 # đơn vị là GFLOPS của Rockchip RK3588
 #
 MIN_S_IN = 400 # KB

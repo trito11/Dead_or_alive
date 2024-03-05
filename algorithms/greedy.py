@@ -9,6 +9,9 @@ sys.path.append(link)
 import environment as env
 from config import *
 import torch
+import random
+from MyGlobal import MyGlobals
+
 class DQNAgent:
     def __init__(self) :
         self.env=env.BusEnv()
@@ -35,10 +38,13 @@ class DQNAgent:
                     action=i+1
                     distance=state[i*2+4]
             return action
+        if greedy=="RR":
+            return random.randint(1,NUM_VEHICLE)
  
     def run(self,greedy):
+        
         self.env.replay()
-        for episode in range(10):
+        for episode in range(90):
             state = self.env.reset()
             done = False
             while not done:
@@ -52,5 +58,7 @@ class DQNAgent:
                         break
                     state = next_state
 if __name__ == '__main__':
+    greedy='RR'
+    MyGlobals.folder_name=f"test/{greedy}/"
     Agent=DQNAgent()
-    Agent.run('distance')
+    Agent.run(greedy)

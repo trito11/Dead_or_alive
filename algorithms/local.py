@@ -26,8 +26,8 @@ link=os.path.join(link, "system_model")
 sys.path.append(link)
 from itertools import count
 import environment as env
-
-
+from config import *
+from MyGlobal import MyGlobals
 
 class Agent_local:
     def __init__(self):
@@ -51,5 +51,6 @@ class Agent_local:
             print(f'Episode {ep}, avarage_reward: {self.env.old_avg_reward}\n')
 
 if __name__ == '__main__':
+    MyGlobals.folder_name="test/local/"
     agent = Agent_local()
-    agent.run(num_ep=20)
+    agent.run(num_ep=90)
