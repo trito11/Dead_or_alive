@@ -38,7 +38,7 @@ class DQNAgent:
                     action=i+1
                     distance=state[i*2+4]
             return action
-        if greedy=="RR":
+        if greedy=="Round_Robin":
             return random.randint(1,NUM_VEHICLE)
  
     def run(self,greedy):
@@ -58,7 +58,7 @@ class DQNAgent:
                         break
                     state = next_state
 if __name__ == '__main__':
-    greedy='RR'
+    greedy='Round_Robin'
     MyGlobals.folder_name=f"test/{greedy}/"
     Agent=DQNAgent()
     Agent.run(greedy)
