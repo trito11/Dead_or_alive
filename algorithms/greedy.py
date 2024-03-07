@@ -58,7 +58,7 @@ class DQNAgent:
                         break
                     state = next_state
 if __name__ == '__main__':
-    greedy='Round_Robin'
+    greedy='distance'
     MyGlobals.folder_name=f"test/{greedy}/"
     Agent=DQNAgent()
     Agent.run(greedy)

@@ -124,8 +124,8 @@ class BusEnv(gym.Env):
 
         after_time = data[data[:, 0] >= time]
         pre_time = data[data[:, 0] <= time]
-        if len(after_time) == 0:
-            return 1.8,1.8
+        # if len(after_time) == 0:
+        #     return 1.8,1.8
         las = after_time[0]
         first = pre_time[-1]
         diff1=las[0]-first[0]
@@ -207,12 +207,13 @@ class BusEnv(gym.Env):
             # print(self.observation[5:23:2])
             # print(f"Khoang cach:{distance_req}")
             #hàng đợi cũ
-            old_waiting_queue = self.observation[3+(action)*2]
+            old_waiting_queue = self.observation[(action)*2+3]
             # print(f"hang cho:{old_waiting_queue}")
             Rate_trans_req_data = getRateTransData(channel_banwidth=CHANNEL_BANDWIDTH, pr=Pr, distance=distance_req,
                                                    path_loss_exponent=PATH_LOSS_EXPONENT, sigmasquare=SIGMASquare)
             #thời gian truyền đi
-            # print(f"Thoi gian truyen{self.observation[1]/(Rate_trans_req_data)}/n")
+            # print(f"Thoi gian truyen{self.observation[1]/(Rate_trans_req_data)}")
+            # print(f"Tốc độ xử lý :{self.observation[0] / PROCESSING_POWER }\n")
         
 
             # waiting queue                        # computation required / computation
@@ -231,10 +232,9 @@ class BusEnv(gym.Env):
             Rate_trans_res_data = getRateTransData(channel_banwidth=CHANNEL_BANDWIDTH, pr=Pr, distance=distance_response,
                                                    path_loss_exponent=PATH_LOSS_EXPONENT, sigmasquare=SIGMASquare)
             #Tính toán thời gian trễ
-            time_delay = new_waiting_queue + \
-                self.observation[2]/(Rate_trans_res_data)
+            time_delay = new_waiting_queue + self.observation[2]/(Rate_trans_res_data)
             #Cập nhật lại hàng chờ
-            self.observation[3+(action)*2] = new_waiting_queue
+            self.observation[(action)*2+3] = new_waiting_queue
 
         #nếu drop thì xử lý tại local
         else:
@@ -255,18 +255,17 @@ class BusEnv(gym.Env):
         #tính toán phần thưởng
         reward_drop=-drop_out/EXPECTED_DROP
 
-        if precent_time_finish>=0:
-            reward_not_drop=0
-        else:
-            reward_not_drop=precent_time_finish
+        # if precent_time_finish>=0:
+        #     reward_not_drop=0
+        # else:
+        #     reward_not_drop=precent_time_finish
 
-        reward = reward_not_drop
+        reward = min(0, extra_time)
 
         # reward = self.alpha*reward_not_drop+ (1-self.alpha)* reward_drop
 
         # caculate tolerance time
-        self.sum_tolerance_time += max(0, time_delay - self.observation[3])
-        
+        self.sum_tolerance_time += max(0, -extra_time)
         self.n_tasks_extra_allocation[action] += extra_time
 
 
@@ -348,7 +347,7 @@ class BusEnv(gym.Env):
             self.sum_over_time = 0
             self.sum_delay = 0
 
-        return self.observation, reward, done, 
+        return self.observation, reward, done
         
     
     
