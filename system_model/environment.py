@@ -99,22 +99,26 @@ class BusEnv(gym.Env):
         self.nstep = 0
 
     #Lấy dữ liệu của xe bus, xử lý rồi đưa nó vào 1 list
-    def load_bus_data(self, num_files=14):
+    def load_bus_data(self, num_files=15):
         data_list = {}
-        for i in range(1, num_files + 1):
-            filename = f"xe_{i}"
-            data_list[filename]=self.preprocessBusLocation(filename)
+        for i in range(1, num_files+1 ):
+            filename = f"xe_{i+11}"
+            name=f"xe_{i}"
+            data_list[name]=self.preprocessBusLocation(filename)
         return data_list
 
     #Lấy dữ liệu xe bus từ file csv trừ đi thời gian min để tất cả bắt đầu từ 0, đưa thời gian về s
     def preprocessBusLocation(self, excel_file):
         #địa chỉ bus
         a = pd.read_csv(os.path.join(DATA_BUS, excel_file))
+        value=a.iloc[0,0]
+        a=a[a.iloc[:, 0] == value].copy()
         a['hex'] = a.apply(lambda x: h3.geo_to_h3(x.latitude,x.longitude,7),1)
         a = a[a['hex'].isin(NEIGHBOR_HEX)]
-        a = a.iloc[100:500, [1, 4, 5]]
+        a = a.iloc[30:500, [1, 4, 5]]
+        a=a.reset_index(drop=True)
         a['time'] = a['time'].apply(time_to_seconds)
-        min_time=a['time'].min()
+        min_time=a['time'][0]
         a['time']-=min_time
         return a.to_numpy()
     
@@ -131,7 +135,10 @@ class BusEnv(gym.Env):
         diff1=las[0]-first[0]
         diff2=time-first[0]
         # weighted average of the distance
-        lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],las[2],diff2/diff1)
+        if diff1==0:
+            lat,lng=first[1],first[2]
+        else:
+            lat,lng=calculate_intermediate_coordinate(first[1],first[2],las[1],las[2],diff2/diff1)
         return lat, lng
 
 
@@ -175,13 +182,13 @@ class BusEnv(gym.Env):
         for i in range(NUM_VEHICLE):
             bus_lat,bus_lng = self.readcsv(f"xe_{i+1}",self.time)
             self.observation[2 *
-                                 i + 4] = haversine(bus_lat,bus_lng,self.queue[0][1],self.queue[0][2])
+                                 i + 5] = haversine(bus_lat,bus_lng,self.queue[0][1],self.queue[0][2])
     
         #Nếu ko phải episode đầu thì trừ hàng chờ đi độ lệch time giữa đít episode trc và đầu episode sau
         if self.index_of_episode!=0:
             for i in range(NUM_VEHICLE):
-                self.observation[2 * i + 5] = max(
-                    0, self.observation[2 * i + 5]-(self.time-self.time_last))
+                self.observation[2 * i + 6] = max(
+                    0, self.observation[2 * i + 6]-(self.time-self.time_last))
         #Thời gian cuối episode
         self.time_last = self.data[-1][0]
                 
@@ -189,6 +196,7 @@ class BusEnv(gym.Env):
         self.observation[1] = self.queue[0][5] #s_in
         self.observation[2] = self.queue[0][6] #s_out
         self.observation[3] = self.queue[0][7] #deadline
+        self.observation[4] = self.queue[0][0]
         
         # Chỉ đến episode tiếp theo
         self.index_of_episode +=1
@@ -203,15 +211,17 @@ class BusEnv(gym.Env):
         #Nếu không drop
         if action > 0:
             #khoảng cách yêu cầu
-            distance_req = self.observation[(action)*2+2]
-            # print(self.observation[5:23:2])
-            # print(f"Khoang cach:{distance_req}")
+            distance_req = self.observation[(action)*2+3]
+            
             #hàng đợi cũ
-            old_waiting_queue = self.observation[(action)*2+3]
+            old_waiting_queue = self.observation[(action)*2+4]
             # print(f"hang cho:{old_waiting_queue}")
             Rate_trans_req_data = getRateTransData(channel_banwidth=CHANNEL_BANDWIDTH, pr=Pr, distance=distance_req,
                                                    path_loss_exponent=PATH_LOSS_EXPONENT, sigmasquare=SIGMASquare)
             #thời gian truyền đi
+            # print(self.observation[5:23:2])
+            # print(self.observation[6:24:2])
+            # print(f"Khoang cach:{distance_req}")
             # print(f"Thoi gian truyen{self.observation[1]/(Rate_trans_req_data)}")
             # print(f"Tốc độ xử lý :{self.observation[0] / PROCESSING_POWER }\n")
         
@@ -234,7 +244,7 @@ class BusEnv(gym.Env):
             #Tính toán thời gian trễ
             time_delay = new_waiting_queue + self.observation[2]/(Rate_trans_res_data)
             #Cập nhật lại hàng chờ
-            self.observation[(action)*2+3] = new_waiting_queue
+            self.observation[(action)*2+4] = new_waiting_queue
 
         #nếu drop thì xử lý tại local
         else:
@@ -286,21 +296,24 @@ class BusEnv(gym.Env):
             #Cập nhật lại các hàng chờ
             for i in range(NUM_VEHICLE):
                 self.observation[2 * i +
-                                 5] = max(0, self.observation[2 * i + 5]-time)
+                                 6] = max(0, self.observation[2 * i + 6]-time)
             #Lấy thời gian hiện tại
             self.time = self.data[0][0]
             #Cập nhật các tác vụ còn lại
             self.data = self.data[self.data[:, 0] != self.data[0, 0]]
         #Còn task trong hàng chờ thì lấy dữ liệu tiếp do thời gian các task trong hàng đợi như nhau lên không cần cập nhật lại hàng chờ
         if len(self.queue) != 0:
+            
             self.observation[0] = self.queue[0][3] #REQUIRED_GPU_FLOPS
             self.observation[1] = self.queue[0][5] #s_in
             self.observation[2] = self.queue[0][6] #s_out
             self.observation[3] = self.queue[0][7] #deadline
+            self.observation[4] = self.queue[0][0]
+            
             for i in range(NUM_VEHICLE):
                 bus_lat,bus_lng=self.readcsv(f"xe_{i+1}",self.queue[0][0])
                 self.observation[2 *
-                                    i + 4] = haversine(bus_lat,bus_lng,self.queue[0][1],self.queue[0][2])
+                                    i + 5] = haversine(bus_lat,bus_lng,self.queue[0][1],self.queue[0][2])
 
 
         # check end of episode?

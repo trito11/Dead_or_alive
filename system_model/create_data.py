@@ -107,8 +107,8 @@ def create_task(num_tasks = NUM_TASKS_PER_TIME_SLOT, time_each_episode = TIME_EA
 
 
             # print(len(lat))
-            # print(num_tasks)
-            # print(len(time))
+            print(sum(tasks_per_interval))
+            print(len(time))
             # lượng tài nguyên cần thiết - cấu hình trong trong file config
             r = np.random.randint(REQUIRED_GPU_FLOPS[0], REQUIRED_GPU_FLOPS[1],NUM_TASKS_PER_TIME_SLOT)
             # 

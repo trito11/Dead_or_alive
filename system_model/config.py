@@ -27,13 +27,13 @@ PATH_LOSS_EXPONENT = 4
 # Tham số về mô hình
 NUM_VEHICLE = 10
 NUM_ACTION = NUM_VEHICLE +1 # thêm 1 trường hợp bị là loại bỏ
-NUM_STATE = NUM_VEHICLE*2+4 # [[REQUIRED_GPU_FLOPS,s_in,s_out,deadline][cac khoang cach toi xe 1, do dai hang cho xe 1], [tuong tu voi xe 2], ...]
-NUM_TASKS_PER_TIME_SLOT = 800 #Số tác vụ moi time slot la 30s
+NUM_STATE = NUM_VEHICLE*2+5 # [[REQUIRED_GPU_FLOPS,s_in,s_out,time,deadline][cac khoang cach toi xe 1, do dai hang cho xe 1], [tuong tu voi xe 2], ...]
+NUM_TASKS_PER_TIME_SLOT = 4000 #Số tác vụ moi time slot la 30s
 EXPECTED_DROP=30
 TIME_EACH_EPISODE = 30 # giay
 NUM_EPISODE = 100
 MIN_NUM_TIME=200
-MAX_NUM_TIME=300
+MAX_NUM_TIME=250
 
 # Đường dẫn lưu trữ file
 LINK_PROJECT = Path(os.path.abspath(__file__))
@@ -53,8 +53,8 @@ REQUIRED_CPU_CYCLE = 400
 REQUIRED_GPU_FLOPS = [2500, 3000] # đơn vị là GFLOPs
 IMAGE_RECOGNITION = 0.615 # đơn vị là GFLOPs
 BUS_OBJECT_DTECTION= 6586 #Lâu lâu xe bus nhận diện biển báo trên đường
-# PROCESSING_POWER=12134 # đơn vị là GFLOPS của GTX 4050
-PROCESSING_POWER=82580 # đơn vị là GFLOPS của GTX 4090
+PROCESSING_POWER=12134 # đơn vị là GFLOPS của GTX 4050
+# PROCESSING_POWER=82580 # đơn vị là GFLOPS của GTX 4090
 REQUIRED_GPU_RAM=1782.56 #Đơn vị là MB
 GPU_RAM_BUS=16 #GB RAM của GTX 4050
 MOBIE_GPU_FLOPS_MIN=37
@@ -78,7 +78,7 @@ NUM_NEIGHBORHOOD=2
 #Lấy mã của ô H3 trung tâm ứng với mức hex_level
 CENTER_H3 = h3.geo_to_h3(HEX_CENTER_COORDINATES[0], HEX_CENTER_COORDINATES[1], HEX_LEVEL)
 #Lấy mã các ô xung quanh
-NEIGHBOR_HEX = {'87a8a0613ffffff', '87a8a060affffff', '87a8a0611ffffff', '87a8a0618ffffff', '87a8a060effffff', '87a8a061cffffff', '87a8a061dffffff',  '87a8a0619ffffff', '87a8a061effffff'}
+NEIGHBOR_HEX = {'87a8a060affffff', '87a8a0618ffffff', '87a8a061cffffff', '87a8a061dffffff',  '87a8a0619ffffff', '87a8a060effffff'}
 #Tham số cho các phân phối
 LAMDA = 100 #Poisson
 SEED=26

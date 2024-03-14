@@ -24,19 +24,19 @@ class DQNAgent:
     def select_action(self,state,greedy):
         if greedy=='queue':
             action=1
-            queue=state[5]
+            queue=state[6]
             for i in range(1,NUM_VEHICLE):
-                if state[i*2+5]<=queue:
+                if state[i*2+6]<=queue:
                     action=i+1
-                    queue=state[i*2+5]
+                    queue=state[i*2+6]
             return action
         if greedy=='distance':
             action=1
-            distance=state[4]
+            distance=state[5]
             for i in range(1,NUM_VEHICLE):
-                if state[i*2+4]<distance:
+                if state[i*2+5]<distance:
                     action=i+1
-                    distance=state[i*2+4]
+                    distance=state[i*2+5]
             return action
         if greedy=="Round_Robin":
             return random.randint(1,NUM_VEHICLE)
@@ -44,7 +44,7 @@ class DQNAgent:
     def run(self,greedy):
         
         self.env.replay()
-        for episode in range(90):
+        for episode in range(100):
             state = self.env.reset()
             done = False
             while not done:
